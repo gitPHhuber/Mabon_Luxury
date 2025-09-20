@@ -20,7 +20,7 @@ export const Footer = () => (
                     <h4 className="font-sans uppercase tracking-wider font-bold">О нас</h4>
                      <ul className="mt-4 space-y-2 text-sm font-sans">
                         <li><Link to="/about" className="hover:underline">Наша история</Link></li>
-                        <li><a href="#" className="hover:underline">Контакты</a></li>
+                        <li><Link to="/contacts" className="hover:underline">Контакты</Link></li>
                     </ul>
                 </div>
                 <div>
@@ -33,6 +33,11 @@ export const Footer = () => (
             </div>
             <div className="mt-12 border-t border-brown-gray border-opacity-20 pt-8 text-center text-sm font-sans">
                 <p>&copy; {new Date().getFullYear()} Mabon. Все права защищены.</p>
+                <p className="mt-2 text-xs text-brown-gray/70">
+                    Сайт создан <a href="https://t.me/BrawlikSoul" target="_blank" rel="noopener noreferrer" className="underline hover:text-brown-gray">@BrawlikSoul</a>.
+                    <br />
+                    Коммерческое использование без согласия запрещено.
+                </p>
             </div>
         </div>
     </footer>

@@ -33,11 +33,14 @@ export const Header = () => {
     useEffect(() => {
         if (isMobileMenuOpen) {
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('menu-open');
         } else {
             document.body.style.overflow = 'auto';
+            document.body.classList.remove('menu-open');
         }
         return () => {
             document.body.style.overflow = 'auto';
+            document.body.classList.remove('menu-open');
         };
     }, [isMobileMenuOpen]);
 
@@ -51,11 +54,14 @@ export const Header = () => {
         const handler = setTimeout(() => {
             const lowercasedQuery = searchQuery.toLowerCase();
             const foundProducts = products.filter(p =>
-                p.name.toLowerCase().includes(lowercasedQuery)
+                p.name.toLowerCase().includes(lowercasedQuery) ||
+                p.description.toLowerCase().includes(lowercasedQuery) ||
+                p.collection.toLowerCase().includes(lowercasedQuery)
             ).slice(0, 5);
 
             const foundAuthors = authors.filter(a =>
-                a.name.toLowerCase().includes(lowercasedQuery)
+                a.name.toLowerCase().includes(lowercasedQuery) ||
+                a.bio.toLowerCase().includes(lowercasedQuery)
             ).slice(0, 3);
 
             const hasResults = foundProducts.length > 0 || foundAuthors.length > 0;
@@ -126,6 +132,7 @@ export const Header = () => {
                         <Link to="/collections" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">Коллекции</Link>
                         <Link to="/authors" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">Авторы</Link>
                         <Link to="/about" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">О нас</Link>
+                        <Link to="/contacts" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">Контакты</Link>
                     </div>
                      <div ref={searchContainerRef} className="relative">
                         <form onSubmit={handleSearchSubmit}>
@@ -242,75 +249,80 @@ export const Header = () => {
                     </button>
                     <button onClick={() => setIsMobileMenuOpen(true)} className="btn-icon" aria-label="Открыть меню" aria-expanded={isMobileMenuOpen}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m8-6H4" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-8-6H4" />
                         </svg>
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
-            <div 
-                className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[99] md:hidden transition-opacity duration-500 ease-in-out ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            {/* Mobile Menu Drawer */}
+            <div
+                className={`fixed inset-0 bg-brown-gray bg-opacity-50 z-[99] md:hidden transition-opacity duration-300
+                    ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`
+                }
                 onClick={() => setIsMobileMenuOpen(false)}
                 aria-hidden="true"
             ></div>
-            
-            {/* Mobile Menu Panel */}
-            <div 
-                className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-cream z-[100] md:hidden transition-transform duration-500 ease-in-out shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`} 
-                role="dialog" 
+            <div
+                className={`fixed top-0 right-0 h-full w-full max-w-sm z-[100] shadow-2xl md:hidden transform transition-transform duration-300 ease-in-out flex flex-col p-6
+                    ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`
+                }
+                style={{ backgroundColor: '#f6f3e1' }}
+                role="dialog"
                 aria-modal="true"
             >
-                <div className="flex flex-col h-full p-6 font-sans">
-                    <div className="flex justify-between items-center">
-                        <Link to="/" onClick={handleMenuLinkClick} className="font-logo text-3xl font-bold tracking-widest text-brown-gray">MABON</Link>
-                        <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Закрыть меню" className="btn-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
+                {/* Menu Header */}
+                <div className="flex justify-between items-center">
+                    <Link to="/" onClick={handleMenuLinkClick} className="font-logo text-3xl font-bold tracking-widest text-gray-900">MABON</Link>
+                    <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Закрыть меню" className="btn-icon !text-gray-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                {/* Menu Content (Centered) */}
+                <div className="flex-grow flex flex-col justify-center items-center text-center font-sans text-gray-900">
+                    <nav className="flex flex-col space-y-6">
+                        <Link to="/collections" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Коллекции</Link>
+                        <Link to="/authors" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Авторы</Link>
+                        <Link to="/about" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">О нас</Link>
+                        <Link to="/contacts" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Контакты</Link>
+                    </nav>
+
+                    <div className="mt-12 w-full max-w-xs">
+                        <form onSubmit={handleSearchSubmit} className="relative">
+                            <input
+                                type="search"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Поиск по сайту..."
+                                className="w-full bg-transparent border-b border-gray-900/50 py-2 text-lg text-gray-900 placeholder-gray-900/70 focus:outline-none focus:border-gray-900 transition-colors text-center"
+                                aria-label="Поиск по сайту"
+                            />
+                            <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-900 transition-opacity hover:opacity-80" aria-label="Начать поиск">
+                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </form>
                     </div>
+                </div>
 
-                    <div className="flex-grow flex flex-col justify-center py-8 text-brown-gray">
-                        <nav className="flex flex-col text-left space-y-6">
-                            <Link to="/collections" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Коллекции</Link>
-                            <Link to="/authors" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Авторы</Link>
-                            <Link to="/about" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">О нас</Link>
-                        </nav>
-
-                        <div className="mt-12 w-full">
-                            <form onSubmit={handleSearchSubmit} className="relative">
-                                <input
-                                    type="search"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Поиск по сайту..."
-                                    className="w-full bg-transparent border-b border-brown-gray/50 py-2 text-lg placeholder-brown-gray/70 focus:outline-none focus:border-brown-gray transition-colors"
-                                    aria-label="Поиск по сайту"
-                                />
-                                <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-brown-gray transition-opacity hover:opacity-80" aria-label="Начать поиск">
-                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div className="text-left text-brown-gray">
-                        {user ? (
-                            <div className="text-lg">
-                                <p className="font-bold truncate">Привет, {user.name}</p>
-                                <div className="flex flex-col items-start space-y-2 mt-4 text-base">
-                                    {user.name === 'admin' && (
-                                        <Link to="/admin" onClick={handleMenuLinkClick} className="hover:underline">Панель</Link>
-                                    )}
-                                    <Link to="/profile" onClick={handleMenuLinkClick} className="hover:underline">Профиль</Link>
-                                    <button onClick={handleLogoutAndCloseMenu} className="hover:underline">Выйти</button>
-                                </div>
+                {/* Menu Footer */}
+                <div className="text-center pb-4 text-gray-900 w-full max-w-xs mx-auto">
+                    {user ? (
+                        <div className="text-lg">
+                            <p className="font-bold truncate">Привет, {user.name}</p>
+                            <div className="flex flex-col items-stretch space-y-3 mt-6">
+                                {user.name === 'admin' && (
+                                    <Link to="/admin" onClick={handleMenuLinkClick} className="block py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Панель</Link>
+                                )}
+                                <Link to="/profile" onClick={handleMenuLinkClick} className="block py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Профиль</Link>
+                                <button onClick={handleLogoutAndCloseMenu} className="block w-full py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Выйти</button>
                             </div>
-                        ) : (
-                            <Link to="/login" onClick={handleMenuLinkClick} className="text-lg hover:underline">Войти / Регистрация</Link>
-                        )}
-                    </div>
+                        </div>
+                    ) : (
+                         <Link to="/login" onClick={handleMenuLinkClick} className="block py-3 text-lg text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Войти / Регистрация</Link>
+                    )}
                 </div>
             </div>
         </header>

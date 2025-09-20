@@ -31,7 +31,7 @@ export const AdminDashboardPage = () => {
 
             <section className="mt-8">
                 <h2 className="text-2xl font-semibold text-gray-700 mb-4">Быстрые действия</h2>
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                     <Link to="/admin/products/new" className="btn btn-primary">
                         <PlusIcon />
                         Добавить продукт

@@ -34,7 +34,7 @@ export const CollectionsPage = () => {
 
     const [priceRange, setPriceRange] = useState<[number, number]>([minPrice, maxPrice]);
     const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
-
+    
     useEffect(() => {
         resetFilters();
     }, [collectionFilter, minPrice, maxPrice]);
@@ -48,9 +48,7 @@ export const CollectionsPage = () => {
         setLoading(true);
         let tempProducts = collectionFilter === 'Все' ? products : products.filter(p => p.collection === collectionFilter);
         
-
         tempProducts = tempProducts.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
 
         if (selectedAuthors.length > 0) {
             tempProducts = tempProducts.filter(p => selectedAuthors.includes(p.authorId));

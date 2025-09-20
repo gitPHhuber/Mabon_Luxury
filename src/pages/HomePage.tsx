@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { CollectionCard } from '../components/ui/CollectionCard';
@@ -10,6 +10,25 @@ import { CollectionCardSkeleton } from '../components/ui/skeletons/CollectionCar
 import { useData } from '../context/DataContext';
 import { Product, Author } from '../data/db';
 import { ProductCard } from '../components/ui/ProductCard';
+
+const heroVideos = [
+    { 
+        src: "https://videos.pexels.com/video-files/3796398/3796398-hd_1920_1080_25fps.mp4",
+        poster: "https://images.pexels.com/videos/3796398/pexels-photo-3796398.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+    },
+    { 
+        src: "https://videos.pexels.com/video-files/3015502/3015502-hd_1920_1080_25fps.mp4",
+        poster: "https://images.pexels.com/videos/3015502/pexels-photo-3015502.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+    },
+    { 
+        src: "https://videos.pexels.com/video-files/8063940/8063940-hd_1920_1080_30fps.mp4",
+        poster: "https://images.pexels.com/videos/8063940/pexels-photo-8063940.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+    },
+    { 
+        src: "https://videos.pexels.com/video-files/8061655/8061655-hd_1920_1080_25fps.mp4",
+        poster: "https://images.pexels.com/videos/8061655/pexels-photo-8061655.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+    }
+];
 
 export const HomePage = () => {
     const { products, authors, collections } = useData();
@@ -26,6 +45,8 @@ export const HomePage = () => {
         featuredProducts: [],
     });
     const [offsetY, setOffsetY] = useState(0);
+    const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+    const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     
     const memoizedCollections = useMemo(() => collections, [collections]);
 
@@ -36,6 +57,37 @@ export const HomePage = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentVideoIndex(prevIndex => (prevIndex + 1) % heroVideos.length);
+        }, 8000); 
+        return () => clearInterval(timer);
+    }, []);
+
+
+    useEffect(() => {
+        const currentVideo = videoRefs.current[currentVideoIndex];
+        if (!currentVideo) return;
+
+        currentVideo.currentTime = 0;
+        const playPromise = currentVideo.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+
+                if (error.name !== 'AbortError') {
+                    console.error("Video autoplay failed:", error);
+                }
+            });
+        }
+
+
+        return () => {
+            currentVideo.pause();
+        };
+    }, [currentVideoIndex]);
+
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -53,25 +105,30 @@ export const HomePage = () => {
     
     return (
     <>
-        <section className="relative h-[80vh] min-h-[500px] flex items-center justify-center text-white text-center fade-in">
+        <section className="relative h-[65vh] md:h-[80vh] min-h-[450px] md:min-h-[500px] flex items-center justify-center text-white text-center fade-in">
             <div className="absolute inset-0 overflow-hidden">
-                 <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                    poster="https://images.unsplash.com/photo-1617991504905-f379101d24a1?q=80&w=1800&fit=crop"
-                    src="https://videos.pexels.com/video-files/5771899/5771899-hd_1920_1080_25fps.mp4"
-                    style={{ transform: `translateY(${offsetY * 0.4}px)` }}
-                >
-                    Ваш браузер не поддерживает видео тег.
-                </video>
+                 {heroVideos.map((video, index) => (
+                     <video
+                        key={video.src}
+                        ref={el => { videoRefs.current[index] = el }}
+                        loop
+                        muted
+                        playsInline
+                        className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                            index === currentVideoIndex ? 'opacity-100' : 'opacity-0'
+                        }`}
+                        poster={video.poster}
+                        style={{ transform: `translateY(${offsetY * 0.4}px)` }}
+                    >
+                        <source src={video.src} type="video/mp4" />
+                        Ваш браузер не поддерживает видео тег.
+                    </video>
+                 ))}
             </div>
             <div className="absolute inset-0 bg-brown-gray opacity-50"></div>
             <div className="relative z-10 p-6 animate-slide-in-up font-sans">
-                <h1 className="text-5xl md:text-7xl font-bold tracking-wider">Гармония Наследия и Инноваций</h1>
-                <p className="mt-4 max-w-2xl mx-auto text-lg">Фарфор, который превращает повседневность в искусство.</p>
+                <h1 className="text-4xl md:text-7xl font-bold tracking-wider">Гармония Наследия и Инноваций</h1>
+                <p className="mt-4 max-w-2xl mx-auto text-base md:text-lg">Фарфор, который превращает повседневность в искусство.</p>
                 <Link to="/collections" className="mt-8 btn btn-inverted">
                     Изучить коллекции
                 </Link>

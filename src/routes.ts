@@ -12,6 +12,7 @@ import { WishlistPage } from './pages/WishlistPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ContactsPage } from './pages/ContactsPage';
 
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { ManageProductsPage } from './pages/admin/ManageProductsPage';
@@ -35,6 +36,7 @@ const allRoutes: RouteConfig[] = [
     { path: 'authors/:id', Component: AuthorDetailPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'products/:id', Component: ProductDetailPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'about', Component: AboutPage, nodeRef: React.createRef<HTMLDivElement>() },
+    { path: 'contacts', Component: ContactsPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'checkout', Component: CheckoutPage, nodeRef: React.createRef<HTMLDivElement>(), isProtected: true },
     { path: 'order-success', Component: OrderSuccessPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'search', Component: SearchPage, nodeRef: React.createRef<HTMLDivElement>() },

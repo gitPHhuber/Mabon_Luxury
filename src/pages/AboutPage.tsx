@@ -7,7 +7,7 @@ export const AboutPage = () => (
         <div className="container mx-auto px-6 py-24 fade-in min-h-[80vh]">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
                 <div className="md:col-span-1">
-                    <h1 className="font-sans text-5xl text-brown-gray sticky top-28">Наша философия</h1>
+                    <h1 className="font-sans text-5xl text-brown-gray md:sticky top-28">Наша философия</h1>
                 </div>
                 <div className="md:col-span-3">
                     <p className="text-lg leading-relaxed max-w-3xl">

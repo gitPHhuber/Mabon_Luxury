@@ -11,6 +11,7 @@ export const ProtectedRoute = ({ children, adminOnly = false }: { children: Reac
     }
     
     if (adminOnly && user.name !== 'admin') {
+
         return <Navigate to="/" replace />;
     }
 

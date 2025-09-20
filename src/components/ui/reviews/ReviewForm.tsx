@@ -70,7 +70,7 @@ export const ReviewForm = ({ productId, onReviewSubmitted }: { productId: string
         if (!validateForm() || !user) return;
 
         setIsSubmitting(true);
-
+        
         const imageBase64Strings = await Promise.all(images.map(file => toBase64(file)));
         
         addReview({
@@ -80,7 +80,7 @@ export const ReviewForm = ({ productId, onReviewSubmitted }: { productId: string
             title,
             text,
             images: imageBase64Strings,
-            isVerifiedPurchase: true, 
+            isVerifiedPurchase: true,
         });
         
         showNotification('Спасибо! Ваш отзыв отправлен на модерацию.', 'success');

@@ -10,11 +10,9 @@ interface PaginationResult<T> {
 export const usePagination = <T>(data: T[], itemsPerPage: number): PaginationResult<T> => {
     const [currentPage, setCurrentPage] = useState(1);
 
-
     const totalPages = useMemo(() => Math.ceil(data.length / itemsPerPage), [data.length, itemsPerPage]);
 
     useEffect(() => {
-
         const lastPage = totalPages > 0 ? totalPages : 1;
         if (currentPage > lastPage) {
             setCurrentPage(lastPage);

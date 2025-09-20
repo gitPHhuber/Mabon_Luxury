@@ -34,23 +34,6 @@ const ChatMessage = ({ message }: { message: Message }) => {
 export const ChatWidget = () => {
     const { isChatOpen, toggleChat, messages, addMessage } = useChat();
     const [inputValue, setInputValue] = useState('');
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    useEffect(() => {
-        if (isChatOpen) {
-            scrollToBottom();
-        }
-    }, [messages, isChatOpen]);
-
-    useEffect(() => {
-        if (isChatOpen) {
-            scrollToBottom();
-        }
-    }, [isChatOpen]);
     
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
@@ -75,7 +58,6 @@ export const ChatWidget = () => {
                 </header>
                 <div className="flex-1 p-4 overflow-y-auto space-y-4">
                     {messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
-                    <div ref={messagesEndRef} />
                 </div>
                 <form onSubmit={handleSendMessage} className="p-4 border-t flex items-center gap-2">
                     <input

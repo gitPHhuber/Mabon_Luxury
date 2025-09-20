@@ -66,11 +66,11 @@ export const ProductDetailPage = () => {
     const changeImage = (newIndex: number) => {
         if (newIndex === currentIndex || isTransitioning) return;
         
-        setIsTransitioning(true); 
+        setIsTransitioning(true);
         setTimeout(() => {
-            setCurrentIndex(newIndex); 
+            setCurrentIndex(newIndex);
             setIsTransitioning(false); 
-        }, 200); 
+        }, 200);
     };
 
     const handleNext = () => {
@@ -132,7 +132,7 @@ export const ProductDetailPage = () => {
                                 </>
                             )}
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap justify-center md:justify-start gap-2">
                             {gallery.map((imgUrl, index) => (
                                  <button key={index} onClick={() => changeImage(index)} className={`w-24 h-24 bg-cream p-1 transition-all ${currentIndex === index ? 'ring-2 ring-brown-gray' : 'opacity-60 hover:opacity-100'}`}>
                                     <ImageWithLoader src={imgUrl} alt={`${product.name} thumbnail ${index + 1}`} className="w-full h-full" imageClassName="w-full h-full object-cover" />
@@ -145,10 +145,10 @@ export const ProductDetailPage = () => {
                         {author && <p className="mt-2 text-lg font-sans"><Link to={`/authors/${author.id}`} className="hover:underline">{author.name}</Link></p>}
                         <p className="mt-4 font-sans text-2xl font-bold text-brown-gray">{product.price.toLocaleString('ru-RU')} ₽</p>
                         <p className="mt-6 text-base leading-relaxed font-serif">{product.description}</p>
-                        <div className="flex items-center space-x-4 mt-8">
+                        <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
                             <button 
                                 onClick={() => addToCart(product)}
-                                className="btn btn-primary w-full md:w-auto">
+                                className="btn btn-primary w-full sm:w-auto flex-grow">
                                 Добавить в корзину
                             </button>
                             <button

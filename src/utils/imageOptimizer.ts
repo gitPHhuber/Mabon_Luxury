@@ -5,16 +5,6 @@ interface ImageOptimizationOptions {
     height?: number;
 }
 
-/**
- * 
- * 
- * 
- * @param src 
- * @param options 
- * @returns 
- */
 export const getOptimizedImageUrl = (src: string, options: ImageOptimizationOptions = {}): string => {
-    
-    
     return src;
 };

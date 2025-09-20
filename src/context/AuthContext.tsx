@@ -4,7 +4,7 @@ interface User {
     id: string;
     name: string;
     email: string;
-    password?: string;
+    password?: string; 
 }
 
 interface AuthResult {
@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-
         const users = getUsers();
         const adminUser = users.find(u => u.name === 'admin');
         if (!adminUser) {
@@ -95,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const newUser: User = { id: Date.now().toString(), name, email, password };
         const updatedUsers = [...users, newUser];
         localStorage.setItem('mabon_users', JSON.stringify(updatedUsers));
-
+        
         const { password: _, ...userToStore } = newUser;
         setUser(userToStore);
         localStorage.setItem('mabon_current_user', JSON.stringify(userToStore));

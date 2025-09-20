@@ -83,6 +83,14 @@
             animation: gentle-bounce 1s ease-in-out;
         }
 
+        @keyframes continuous-scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        .animate-continuous-scroll {
+            animation: continuous-scroll 30s linear infinite;
+        }
+
         main {
             position: relative;
         }
@@ -110,13 +118,20 @@
             top: 0;
             width: 100%;
         }
+        
 
-        /* === BUTTON STYLES === */
+        body.menu-open main, body.menu-open footer {
+            filter: blur(4px) brightness(0.9);
+            transition: filter 0.3s ease-in-out;
+            pointer-events: none;
+            user-select: none;
+        }
+
         .btn {
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            padding: 0.75rem 2rem; /* 12px 32px */
+            padding: 0.75rem 2rem;
             font-family: 'Manrope', sans-serif;
             font-weight: 700;
             text-transform: uppercase;
@@ -133,11 +148,11 @@
         }
 
         .btn-sm {
-            padding: 0.25rem 0.75rem; /* 4px 12px */
-            font-size: 0.75rem; /* 12px */
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem; 
         }
 
-        /* Primary Button */
+
         .btn-primary {
             background-color: #787B7E;
             color: white;
@@ -159,7 +174,6 @@
             box-shadow: none;
         }
 
-        /* Secondary / Outline Button */
         .btn-secondary {
             background-color: transparent;
             color: #787B7E;
@@ -176,7 +190,6 @@
             box-shadow: none;
         }
 
-        /* Inverted (e.g., White) Button */
         .btn-inverted {
             background-color: white;
             color: #787B7E;
@@ -192,7 +205,6 @@
             box-shadow: none;
         }
 
-        /* Text Button */
         .btn-text {
             padding: 0.5rem 1rem;
             background-color: transparent;
@@ -206,7 +218,6 @@
             text-decoration: underline;
         }
         
-        /* Icon Button */
         .btn-icon {
             display: inline-flex;
             align-items: center;
@@ -226,7 +237,6 @@
             transform: scale(0.95);
         }
         
-        /* Danger Button */
         .btn-danger {
             background-color: #dc2626;
             color: white;
@@ -237,7 +247,6 @@
             transform: translateY(-2px);
         }
     </style>
-
 <link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-white font-serif text-brown-gray">

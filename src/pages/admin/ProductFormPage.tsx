@@ -69,16 +69,13 @@ export const ProductFormPage = () => {
             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-4">
                  <h1 className="text-3xl font-bold text-gray-800">{isEditing ? 'Редактировать продукт' : 'Добавить продукт'}</h1>
                  <div className="flex space-x-2">
-                    <Link to="/admin/products" className="btn btn-secondary">
-                        Посмотреть все
-                    </Link>
-                    <Link to="/admin/products/new" className="btn btn-primary">
-                        Добавить новый
+                    <Link to="/admin/products" className="btn btn-secondary flex-1 sm:flex-none">
+                        Все продукты
                     </Link>
                 </div>
             </div>
             
-            <div className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+            <div className="bg-white p-6 md:p-8 rounded-lg shadow-md max-w-2xl mx-auto">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">Название</label>

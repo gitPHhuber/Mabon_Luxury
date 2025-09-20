@@ -38,13 +38,14 @@ export const ManageAuthorsPage = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Управление авторами</h1>
-                <Link to="/admin/authors/new" className="btn btn-primary">
-                    Добавить автора
+                <h1 className="text-3xl font-bold text-gray-800">Авторы</h1>
+                <Link to="/admin/authors/new" className="btn btn-primary flex-shrink-0">
+                    Добавить
                 </Link>
             </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full leading-normal">
                         <thead>
@@ -87,10 +88,40 @@ export const ManageAuthorsPage = () => {
                         </tbody>
                     </table>
                 </div>
-                 {authors.length === 0 && (
-                    <p className="text-center p-8 text-gray-500">Авторов пока нет. <Link to="/admin/authors/new" className="text-indigo-600 hover:underline">Добавить первого автора</Link>.</p>
-                )}
             </div>
+
+            {/* Mobile Card List */}
+            <div className="md:hidden space-y-4">
+                {paginatedAuthors.map(author => (
+                    <div key={author.id} className="bg-white p-4 rounded-lg shadow">
+                        <div className="flex items-center space-x-4">
+                            <div className="flex-shrink-0 w-16 h-16">
+                                <ImageWithLoader src={author.imageUrl} alt={author.name} imageClassName="w-full h-full rounded-full object-cover" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-gray-900 font-semibold">{author.name}</p>
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2 line-clamp-3">{author.bio}</p>
+                        <div className="flex justify-end space-x-2 mt-4">
+                            <Link to={`/admin/authors/edit/${author.id}`} className="btn btn-secondary btn-sm">
+                                Редактировать
+                            </Link>
+                            <button onClick={() => handleDelete(author.id, author.name)} className="btn btn-danger btn-sm">
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+
+            {authors.length === 0 && (
+                <div className="text-center p-8 text-gray-500 bg-white shadow-md rounded-lg">
+                    <p>Авторов пока нет.</p>
+                    <Link to="/admin/authors/new" className="mt-4 btn btn-primary">Добавить первого автора</Link>
+                </div>
+            )}
              {authors.length > 0 && (
                 <Pagination
                     currentPage={currentPage}

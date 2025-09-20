@@ -407,6 +407,7 @@ export const REVIEWS: Review[] = [
     },
 ];
 
+// This remains dynamic as it's derived from the current products list
 export const getCollections = (products: Product[]) => [...new Set(products.map(p => p.collection))].map(c => ({
     name: c,
     imageUrl: products.find(p => p.collection === c)?.imageUrl || ''

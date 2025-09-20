@@ -48,17 +48,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         };
         
         setMessages(prevMessages => [...prevMessages, userMessage]);
-
-        setTimeout(() => {
-            const operatorResponse: Message = {
-                id: Date.now() + 1,
-                text: 'Спасибо за ваше сообщение! Оператор скоро подключится к диалогу.',
-                sender: 'operator',
-                timestamp: new Date().toISOString(),
-            };
-            setMessages(prevMessages => [...prevMessages, operatorResponse]);
-        }, 1500);
-
     }, []);
 
     const value = {

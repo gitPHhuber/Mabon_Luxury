@@ -25,7 +25,6 @@ export const ReviewProvider = ({ children }: { children: React.ReactNode }) => {
     const [reviews, setReviews] = useState<Review[]>([]);
 
     useEffect(() => {
-        // Initialize reviews from localStorage or fall back to mock data
         try {
             const localData = localStorage.getItem('mabon_reviews');
             if (localData) {
@@ -60,7 +59,7 @@ export const ReviewProvider = ({ children }: { children: React.ReactNode }) => {
             ...reviewData,
             id: `r${Date.now()}`,
             createdAt: new Date().toISOString(),
-            status: 'pending',
+            status: 'pending', // Set to pending for moderation
         };
         updateLocalStorage([...reviews, newReview]);
     }, [reviews]);

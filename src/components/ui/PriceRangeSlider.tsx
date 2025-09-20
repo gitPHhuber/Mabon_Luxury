@@ -15,7 +15,6 @@ export const PriceRangeSlider = ({ min, max, value, onChange, step = 1 }: PriceR
     const minValRef = useRef<HTMLInputElement>(null);
     const maxValRef = useRef<HTMLInputElement>(null);
 
-
     const getPercent = useCallback((value: number) => Math.round(((value - min) / (max - min)) * 100), [min, max]);
 
     useEffect(() => {
@@ -29,7 +28,6 @@ export const PriceRangeSlider = ({ min, max, value, onChange, step = 1 }: PriceR
             }
         }
     }, [minVal, getPercent]);
-
 
     useEffect(() => {
         if (minValRef.current) {

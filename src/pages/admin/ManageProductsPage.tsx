@@ -37,13 +37,14 @@ export const ManageProductsPage = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Управление продуктами</h1>
-                <Link to="/admin/products/new" className="btn btn-primary">
-                    Добавить продукт
+                <h1 className="text-3xl font-bold text-gray-800">Продукты</h1>
+                <Link to="/admin/products/new" className="btn btn-primary flex-shrink-0">
+                    Добавить
                 </Link>
             </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full leading-normal">
                         <thead>
@@ -102,10 +103,42 @@ export const ManageProductsPage = () => {
                         </tbody>
                     </table>
                 </div>
-                 {products.length === 0 && (
-                    <p className="text-center p-8 text-gray-500">Продуктов пока нет. <Link to="/admin/products/new" className="text-indigo-600 hover:underline">Добавить первый продукт</Link>.</p>
-                )}
             </div>
+
+            {/* Mobile Card List */}
+            <div className="md:hidden space-y-4">
+                {paginatedProducts.map(product => (
+                    <div key={product.id} className="bg-white p-4 rounded-lg shadow">
+                        <div className="flex items-start space-x-4">
+                            <div className="flex-shrink-0 w-20 h-24">
+                                <ImageWithLoader src={product.imageUrl} alt={product.name} imageClassName="w-full h-full object-cover rounded-md" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-gray-900 font-semibold">{product.name}</p>
+                                <p className="text-sm text-gray-700 mt-1">{product.price.toLocaleString('ru-RU')} ₽</p>
+                                <p className="text-sm text-gray-500 mt-1">{product.collection}</p>
+                                {product.isFeatured && <p className="text-xs text-yellow-600 font-bold mt-1">Избранный</p>}
+                            </div>
+                        </div>
+                        <div className="flex justify-end space-x-2 mt-4">
+                            <Link to={`/admin/products/edit/${product.id}`} className="btn btn-secondary btn-sm">
+                                Редактировать
+                            </Link>
+                            <button onClick={() => handleDelete(product.id, product.name)} className="btn btn-danger btn-sm">
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+
+            {products.length === 0 && (
+                <div className="text-center p-8 text-gray-500 bg-white shadow-md rounded-lg">
+                    <p>Продуктов пока нет.</p>
+                    <Link to="/admin/products/new" className="mt-4 btn btn-primary">Добавить первый продукт</Link>
+                </div>
+            )}
 
             {products.length > 0 && (
                 <Pagination
