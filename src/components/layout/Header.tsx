@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { CSSTransition } from 'react-transition-group';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
@@ -19,8 +20,11 @@ export const Header = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [hasMounted, setHasMounted] = useState(false);
     const searchContainerRef = useRef<HTMLDivElement>(null);
     const profileRef = useRef<HTMLDivElement>(null);
+    const mobileMenuOverlayRef = useRef<HTMLDivElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
     
     const [isInitialLoad] = useState(() => !sessionStorage.getItem('logoAnimated'));
 
@@ -29,6 +33,10 @@ export const Header = () => {
         sessionStorage.setItem('logoAnimated', 'true');
       }
     }, [isInitialLoad]);
+    
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isMobileMenuOpen) {
@@ -249,82 +257,100 @@ export const Header = () => {
                     </button>
                     <button onClick={() => setIsMobileMenuOpen(true)} className="btn-icon" aria-label="Открыть меню" aria-expanded={isMobileMenuOpen}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-8-6H4" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
                 </div>
             </div>
 
             {/* Mobile Menu Drawer */}
-            <div
-                className={`fixed inset-0 bg-brown-gray bg-opacity-50 z-[99] md:hidden transition-opacity duration-300
-                    ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`
-                }
-                onClick={() => setIsMobileMenuOpen(false)}
-                aria-hidden="true"
-            ></div>
-            <div
-                className={`fixed top-0 right-0 h-full w-full max-w-sm z-[100] shadow-2xl md:hidden transform transition-transform duration-300 ease-in-out flex flex-col p-6
-                    ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`
-                }
-                style={{ backgroundColor: '#f6f3e1' }}
-                role="dialog"
-                aria-modal="true"
-            >
-                {/* Menu Header */}
-                <div className="flex justify-between items-center">
-                    <Link to="/" onClick={handleMenuLinkClick} className="font-logo text-3xl font-bold tracking-widest text-gray-900">MABON</Link>
-                    <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Закрыть меню" className="btn-icon !text-gray-900">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
+            {hasMounted && (
+                <>
+                    <CSSTransition
+                        in={isMobileMenuOpen}
+                        timeout={300}
+                        classNames="mobile-menu-overlay"
+                        unmountOnExit
+                        nodeRef={mobileMenuOverlayRef}
+                    >
+                        <div
+                            ref={mobileMenuOverlayRef}
+                            className="fixed inset-0 bg-brown-gray bg-opacity-50 z-[99] md:hidden"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            aria-hidden="true"
+                        ></div>
+                    </CSSTransition>
+                    
+                    <CSSTransition
+                        in={isMobileMenuOpen}
+                        timeout={300}
+                        classNames="mobile-menu"
+                        unmountOnExit
+                        nodeRef={mobileMenuRef}
+                    >
+                        <div
+                            ref={mobileMenuRef}
+                            className="fixed top-0 right-0 h-full w-full max-w-sm z-[100] bg-cream shadow-2xl md:hidden flex flex-col p-6"
+                            role="dialog"
+                            aria-modal="true"
+                        >
+                            {/* Menu Header */}
+                            <div className="flex justify-between items-center">
+                                <Link to="/" onClick={handleMenuLinkClick} className="font-logo text-3xl font-bold tracking-widest text-gray-900">MABON</Link>
+                                <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Закрыть меню" className="btn-icon !text-gray-900">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
 
-                {/* Menu Content (Centered) */}
-                <div className="flex-grow flex flex-col justify-center items-center text-center font-sans text-gray-900">
-                    <nav className="flex flex-col space-y-6">
-                        <Link to="/collections" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Коллекции</Link>
-                        <Link to="/authors" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Авторы</Link>
-                        <Link to="/about" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">О нас</Link>
-                        <Link to="/contacts" onClick={handleMenuLinkClick} className="text-3xl font-serif hover:underline">Контакты</Link>
-                    </nav>
+                            {/* Menu Content (Centered) */}
+                            <div className="flex-grow flex flex-col justify-center items-center text-center font-sans text-gray-900">
+                                <nav className="flex flex-col space-y-6">
+                                    <Link to="/collections" onClick={handleMenuLinkClick} className="text-xl font-serif hover:underline">Коллекции</Link>
+                                    <Link to="/authors" onClick={handleMenuLinkClick} className="text-xl font-serif hover:underline">Авторы</Link>
+                                    <Link to="/about" onClick={handleMenuLinkClick} className="text-xl font-serif hover:underline">О нас</Link>
+                                    <Link to="/contacts" onClick={handleMenuLinkClick} className="text-xl font-serif hover:underline">Контакты</Link>
+                                </nav>
 
-                    <div className="mt-12 w-full max-w-xs">
-                        <form onSubmit={handleSearchSubmit} className="relative">
-                            <input
-                                type="search"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Поиск по сайту..."
-                                className="w-full bg-transparent border-b border-gray-900/50 py-2 text-lg text-gray-900 placeholder-gray-900/70 focus:outline-none focus:border-gray-900 transition-colors text-center"
-                                aria-label="Поиск по сайту"
-                            />
-                            <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-900 transition-opacity hover:opacity-80" aria-label="Начать поиск">
-                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                                <div className="mt-12 w-full">
+                                    <form onSubmit={handleSearchSubmit} className="relative">
+                                        <input
+                                            type="search"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Поиск по сайту..."
+                                            className="w-full bg-transparent border-b border-gray-900/50 py-2 text-base text-gray-900 placeholder-gray-900/70 focus:outline-none focus:border-gray-900 transition-colors text-center"
+                                            aria-label="Поиск по сайту"
+                                        />
+                                        <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-900 transition-opacity hover:opacity-80" aria-label="Начать поиск">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
 
-                {/* Menu Footer */}
-                <div className="text-center pb-4 text-gray-900 w-full max-w-xs mx-auto">
-                    {user ? (
-                        <div className="text-lg">
-                            <p className="font-bold truncate">Привет, {user.name}</p>
-                            <div className="flex flex-col items-stretch space-y-3 mt-6">
-                                {user.name === 'admin' && (
-                                    <Link to="/admin" onClick={handleMenuLinkClick} className="block py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Панель</Link>
+                            {/* Menu Footer */}
+                            <div className="text-center pb-4 text-gray-900 w-full">
+                                {user ? (
+                                    <div className="text-base">
+                                        <p className="font-bold truncate">Привет, {user.name}</p>
+                                        <div className="flex flex-col items-stretch space-y-3 mt-6">
+                                            {user.name === 'admin' && (
+                                                <Link to="/admin" onClick={handleMenuLinkClick} className="block py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Админ панель</Link>
+                                            )}
+                                            <Link to="/profile" onClick={handleMenuLinkClick} className="block py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Профиль</Link>
+                                            <button onClick={handleLogoutAndCloseMenu} className="block w-full py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Выйти</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <Link to="/login" onClick={handleMenuLinkClick} className="block py-3 text-base text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Войти / Регистрация</Link>
                                 )}
-                                <Link to="/profile" onClick={handleMenuLinkClick} className="block py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Профиль</Link>
-                                <button onClick={handleLogoutAndCloseMenu} className="block w-full py-3 text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Выйти</button>
                             </div>
                         </div>
-                    ) : (
-                         <Link to="/login" onClick={handleMenuLinkClick} className="block py-3 text-lg text-center border border-gray-900/50 rounded-md hover:bg-brown-gray/10 transition-colors">Войти / Регистрация</Link>
-                    )}
-                </div>
-            </div>
+                    </CSSTransition>
+                </>
+            )}
         </header>
     );
 };
