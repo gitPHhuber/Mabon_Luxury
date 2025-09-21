@@ -1,0 +1,70 @@
+---
+- name: Deploy self-hosted collaboration platform
+  hosts: all
+  become: true
+  vars:
+    compose_src: "{{ project_root }}"
+    caddy_config_dir: "{{ project_root }}/config/caddy"
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+  tasks:
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - software-properties-common
+          - docker.io
+          - docker-compose-plugin
+          - python3-docker
+          - python3-pip
+        state: present
+
+    - name: Install Python docker SDK
+      ansible.builtin.pip:
+        name: docker
+        state: present
+
+    - name: Ensure docker service is enabled
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create project directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - "{{ project_root }}"
+        - "{{ project_root }}/config"
+        - "{{ caddy_config_dir }}"
+
+    - name: Template docker compose file
+      ansible.builtin.template:
+        src: templates/docker-compose.yml.j2
+        dest: "{{ project_root }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Template Caddyfile
+      ansible.builtin.template:
+        src: templates/Caddyfile.j2
+        dest: "{{ caddy_config_dir }}/Caddyfile"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure compose project is up
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_src }}"
+        state: present

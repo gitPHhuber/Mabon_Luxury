@@ -1,0 +1,40 @@
+{
+    email {{ caddy_admin_email }}
+    auto_https disable_redirects
+}
+
+(security_headers) {
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "no-referrer-when-downgrade"
+        X-XSS-Protection "1; mode=block"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        Content-Security-Policy "default-src 'self'; frame-ancestors 'self' https://auth.{{ base_domain }}"
+    }
+}
+
+nextcloud.{{ base_domain }} {
+    import security_headers
+    tls internal
+    reverse_proxy nextcloud:80 {
+        health_uri /status.php
+    }
+}
+
+office.{{ base_domain }} {
+    import security_headers
+    tls internal
+    reverse_proxy onlyoffice:80 {
+        health_uri /healthcheck
+    }
+}
+
+auth.{{ base_domain }} {
+    import security_headers
+    tls internal
+    reverse_proxy authentik-server:9000 {
+        health_uri /-/health/ready/
+    }
+}

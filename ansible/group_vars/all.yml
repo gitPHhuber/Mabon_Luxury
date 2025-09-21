@@ -1,0 +1,20 @@
+---
+project_root: /opt/infra
+base_domain: infra.local
+caddy_admin_email: admin@infra.local
+nextcloud_admin_user: admin
+nextcloud_admin_password: changemeadmin
+nextcloud_db_password: nextcloudpass
+nextcloud_db_root_password: nextcloudrootpass
+nextcloud_default_phone_region: RU
+authentik_secret_key: "change-me-super-secret"
+authentik_postgres_password: authentikpgpass
+authentik_redis_password: authentikredispass
+onlyoffice_jwt_secret: onlyofficejwtsecret
+postgres_image: postgres:16-alpine
+authentik_image: ghcr.io/goauthentik/server:2024.6.2
+nextcloud_image: nextcloud:27-apache
+mariadb_image: mariadb:10.11
+redis_image: redis:7-alpine
+onlyoffice_image: onlyoffice/documentserver:7.4
+caddy_image: caddy:2.8
