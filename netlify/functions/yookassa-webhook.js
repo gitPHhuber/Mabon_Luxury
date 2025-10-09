@@ -18,7 +18,17 @@ export const handler = async (event) => {
     });
     const p = await r.json();
 
-    console.log("YK webhook:", p.status, p?.metadata?.orderId);
+    if (p?.status === "succeeded") {
+      console.log("[YooKassa] payment succeeded", {
+        status: p.status,
+        orderId: p?.metadata?.orderId,
+      });
+    } else {
+      console.log("[YooKassa] payment status", {
+        status: p?.status,
+        orderId: p?.metadata?.orderId,
+      });
+    }
 
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   } catch (e) {
