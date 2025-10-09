@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -10,8 +10,6 @@ export const CheckoutPage = () => {
     const navigate = useNavigate();
     const [paymentMethod, setPaymentMethod] = useState('sbp');
     const [isProcessing, setIsProcessing] = useState(false);
-    const [showSbpModal, setShowSbpModal] = useState(false);
-    
     const [formData, setFormData] = useState({
         name: user?.name || '',
         email: user?.email || '',
@@ -31,13 +29,41 @@ export const CheckoutPage = () => {
         cvc: ''
     });
 
-    const orderId = useMemo(() => `MBN-${Date.now()}`, []);
-
     useEffect(() => {
         if (cartItems.length === 0 && !isProcessing) {
             navigate('/');
         }
     }, [cartItems, isProcessing, navigate]);
+
+    const payWithSBP = async (items: typeof cartItems, email: string) => {
+        const payload = {
+            items: items.map(item => ({ price: item.price, qty: item.quantity })),
+            email,
+        };
+
+        const res = await fetch('/api/create-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        let data: { redirectUrl?: string; error?: string } | null = null;
+        try {
+            data = await res.json();
+        } catch (err) {
+            console.error('Failed to parse create-payment response', err);
+        }
+
+        if (!res.ok) {
+            throw new Error(data?.error || 'Не удалось создать платёж');
+        }
+
+        if (!data?.redirectUrl) {
+            throw new Error(data?.error || 'Не удалось получить ссылку на оплату');
+        }
+
+        window.location.href = data.redirectUrl;
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -88,7 +114,7 @@ export const CheckoutPage = () => {
         return Object.values(errors).every(e => !e);
     }
     
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (Object.values(formData).some(val => val === '')) {
             alert('Пожалуйста, заполните все контактные данные и адрес.');
@@ -102,37 +128,23 @@ export const CheckoutPage = () => {
         setIsProcessing(true);
 
         if (paymentMethod === 'sbp') {
-            setShowSbpModal(true);
-            setTimeout(() => {
-                setShowSbpModal(false);
-                clearCart();
-                navigate('/order-success', { state: { orderId: orderId, orderItems: cartItems, orderTotal: subtotal } });
-            }, 5000);
-        } else {
-
-            setTimeout(() => {
+            try {
+                await payWithSBP(cartItems, formData.email);
+            } catch (error) {
+                console.error(error);
+                const message = error instanceof Error ? error.message : 'Не удалось создать платёж';
+                alert(message);
                 setIsProcessing(false);
-                clearCart();
-                navigate('/order-success', { state: { orderId: orderId, orderItems: cartItems, orderTotal: subtotal } });
-            }, 3000);
+            }
+            return;
         }
+
+        setTimeout(() => {
+            setIsProcessing(false);
+            clearCart();
+            navigate('/checkout/success');
+        }, 3000);
     };
-    
-    const SbpModal = () => (
-         <div className="fixed inset-0 bg-brown-gray bg-opacity-70 z-[110] flex items-center justify-center font-sans fade-in">
-            <div className="bg-white p-8 rounded-lg text-center max-w-sm w-full">
-                <h3 className="text-2xl font-bold text-brown-gray mb-4">Оплата через СБП</h3>
-                <p className="text-brown-gray mb-4">Отсканируйте QR-код в приложении вашего банка для оплаты.</p>
-                <div className="w-48 h-48 mx-auto my-4 bg-gray-100 p-2 border text-brown-gray">
-                    <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M110 110h36v36h-36z"/><path fill="currentColor" d="M0 0h90v90H0zm10 10v70h70V10z"/><path fill="currentColor" d="M30 30h30v30H30z"/><path fill="currentColor" d="M166 0h90v90h-90zm10 10v70h70V10z"/><path fill="currentColor" d="M196 30h30v30h-30z"/><path fill="currentColor" d="M0 166h90v90H0zm10 10v70h70v-70z"/><path fill="currentColor" d="M30 196h30v30H30z"/><path fill="currentColor" d="M166 110h10v10h-10zm-36 0h10v10h-10zm-10 10h10v10h-10zm-10-20h10v10h-10zm-10 10h10v10h-10zm0 10h10v10h-10zm-10 10h10v10h-10zm-10-20h10v10h-10zm10-10h10v10h-10zm-30 0h10v10h-10zm10-10h10v10h-10zm-10-10h10v10h-10zm10-10h10v10h-10zm10 0h10v10h-10zm-50-10h10v10h-10zm10-10h10v10h-10zm10 0h10v10h-10zm10 0h10v10h-10zm10 0h10v10h-10zm10 0h10v10h-10zm10 0h10v10h-10zm36 0h10v10h-10zm-10-10h10v10h-10zm-10-10h10v10h-10zm-10 10h10v10h-10zm-10-10h10v10h-10zm0 10h10v10h-10zm10 10h10v10h-10zm10 0h10v10h-10zm10-10h10v10h-10zm10 0h10v10h-10zm10-10h10v10h-10zm10 0h10v10h-10zm10 10h10v10h-10zm10-10h10v10h-10zm10 10h10v10h-10zm10 10h10v10h-10zm0-30h10v10h-10zm0 10h10v10h-10zm10 10h10v10h-10zm10-10h10v10h-10zm10-10h10v10h-10zm0 10h10v10h-10zm-36 26h10v10h-10zm-10 10h10v10h-10zm-10 10h10v10h-10zm-10 10h10v10h-10zm-10-10h10v10h-10zm-10-10h10v10h-10zm-10-10h10v10h-10zm-10 0h10v10h-10zm-10-10h10v10h-10zm10-10h10v10h-10zm10-10h10v10h-10zm10 0h10v10h-10zm10 10h10v10h-10zm10 10h10v10h-10zm0 10h10v10h-10zm0 10h10v10h-10zm10-10h10v10h-10zm10 0h10v10h-10zm10-10h10v10h-10zm-36 26h10v10h-10zm10 10h10v10h-10zm-20 0h10v10h-10zm10 10h10v10h-10zm0-30h10v10h-10z"/></svg>
-                </div>
-                <div className="flex items-center justify-center text-brown-gray">
-                    <svg className="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <span>Ожидаем подтверждения...</span>
-                </div>
-            </div>
-        </div>
-    );
 
     const ProcessingModal = () => (
         <div className="fixed inset-0 bg-brown-gray bg-opacity-70 z-[110] flex items-center justify-center font-sans fade-in">
@@ -153,7 +165,6 @@ export const CheckoutPage = () => {
 
     return (
         <div className="container mx-auto px-6 py-12 fade-in">
-            {isProcessing && showSbpModal && <SbpModal />}
             {isProcessing && paymentMethod === 'card' && <ProcessingModal />}
             <h1 className="text-center font-sans text-5xl text-brown-gray mb-12">Оформление заказа</h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
