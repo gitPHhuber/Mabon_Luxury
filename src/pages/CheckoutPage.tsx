@@ -41,19 +41,31 @@ export const CheckoutPage = () => {
             email,
         };
 
-        const res = await fetch('/api/create-payment', {
+        const response = await fetch('/api/create-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        if (!res.ok) {
-            throw new Error('Failed to create payment');
+        let data: { redirectUrl?: string; error?: unknown } | null = null;
+        try {
+            data = await response.json();
+        } catch (err) {
+            console.error('Failed to parse create-payment response', err);
         }
 
-        const { redirectUrl, error } = await res.json();
-        if (error || !redirectUrl) {
-            throw new Error('Invalid payment response');
+        if (!response.ok) {
+            const errorMessage =
+                (typeof data?.error === 'string' && data.error) ||
+                (data?.error && typeof (data.error as { message?: string }) === 'object' && (data.error as { message?: string }).message) ||
+                (data && 'message' in data && typeof data.message === 'string' ? data.message : null) ||
+                'Не удалось создать платёж. Попробуйте ещё раз.';
+            throw new Error(errorMessage);
+        }
+
+        const redirectUrl = data?.redirectUrl;
+        if (!redirectUrl) {
+            throw new Error('Не удалось получить ссылку на оплату. Попробуйте позже.');
         }
 
         window.location.href = redirectUrl;
@@ -126,7 +138,8 @@ export const CheckoutPage = () => {
                 await payWithSBP(cartItems, formData.email);
             } catch (error) {
                 console.error(error);
-                alert('Ошибка создания платежа');
+                const message = error instanceof Error ? error.message : 'Не удалось создать платёж. Попробуйте ещё раз.';
+                alert(message);
                 setIsProcessing(false);
             }
             return;
