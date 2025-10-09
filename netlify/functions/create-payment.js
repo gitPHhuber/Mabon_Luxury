@@ -23,21 +23,53 @@ const buildErrorResponse = (statusCode, message) => ({
   body: JSON.stringify({ error: message }),
 });
 
+
+const resolvePublicUrl = (event, explicitUrl) => {
+  if (explicitUrl) return explicitUrl;
+
+  const headers = event?.headers || {};
+  const protocol =
+    headers["x-forwarded-proto"] || headers["X-Forwarded-Proto"] || "https";
+  const host = headers.host || headers.Host;
+
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+
+  return "";
+};
+
+
 export const handler = async (event) => {
   try {
     const shopId = process.env.YK_SHOP_ID;
     const secret = process.env.YK_SECRET;
-    const publicUrl = process.env.PUBLIC_URL;
-    if (!shopId || !secret || !publicUrl) {
+
+    const publicUrl = resolvePublicUrl(event, process.env.PUBLIC_URL);
+
+    if (!shopId || !secret) {
       console.error("Missing YooKassa configuration", {
         hasShopId: Boolean(shopId),
         hasSecret: Boolean(secret),
-        hasPublicUrl: Boolean(publicUrl),
+        derivedPublicUrl: publicUrl,
+
       });
       return buildErrorResponse(
         500,
         "Платёжный сервис временно недоступен. Попробуйте позже."
       );
+
+    }
+
+    if (!publicUrl) {
+      console.error("Unable to resolve public URL for return link", {
+        headers: event.headers,
+      });
+      return buildErrorResponse(
+        500,
+        "Не удалось определить адрес возврата после оплаты. Попробуйте ещё раз позже."
+      );
+
     }
 
     const body = JSON.parse(event.body || "{}");
@@ -93,6 +125,7 @@ export const handler = async (event) => {
         data?.error ||
         "Не удалось создать платёж. Попробуйте позже.";
       return buildErrorResponse(resp.status || 502, message);
+
     }
 
     if (!url) {
