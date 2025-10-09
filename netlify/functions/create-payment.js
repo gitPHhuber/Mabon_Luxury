@@ -23,6 +23,7 @@ const buildErrorResponse = (statusCode, message) => ({
   body: JSON.stringify({ error: message }),
 });
 
+
 const resolvePublicUrl = (event, explicitUrl) => {
   if (explicitUrl) return explicitUrl;
 
@@ -38,10 +39,12 @@ const resolvePublicUrl = (event, explicitUrl) => {
   return "";
 };
 
+
 export const handler = async (event) => {
   try {
     const shopId = process.env.YK_SHOP_ID;
     const secret = process.env.YK_SECRET;
+
     const publicUrl = resolvePublicUrl(event, process.env.PUBLIC_URL);
 
     if (!shopId || !secret) {
@@ -49,11 +52,13 @@ export const handler = async (event) => {
         hasShopId: Boolean(shopId),
         hasSecret: Boolean(secret),
         derivedPublicUrl: publicUrl,
+
       });
       return buildErrorResponse(
         500,
         "Платёжный сервис временно недоступен. Попробуйте позже."
       );
+
     }
 
     if (!publicUrl) {
@@ -64,6 +69,7 @@ export const handler = async (event) => {
         500,
         "Не удалось определить адрес возврата после оплаты. Попробуйте ещё раз позже."
       );
+
     }
 
     const body = JSON.parse(event.body || "{}");
@@ -119,6 +125,7 @@ export const handler = async (event) => {
         data?.error ||
         "Не удалось создать платёж. Попробуйте позже.";
       return buildErrorResponse(resp.status || 502, message);
+
     }
 
     if (!url) {
