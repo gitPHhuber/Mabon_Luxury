@@ -35,7 +35,6 @@ export const MainLayout = () => {
             'signup': 'Регистрация',
             'profile': 'Профиль',
             'checkout': 'Оформление заказа',
-            'order-success': 'Заказ оформлен',
         };
 
         const firstPath = pathnames[0];
