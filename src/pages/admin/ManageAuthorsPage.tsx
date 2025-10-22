@@ -5,6 +5,7 @@ import { Pagination } from '../../components/ui/Pagination';
 import { useConfirmationModal } from '../../context/ConfirmationModalContext';
 import { ImageWithLoader } from '../../components/ui/ImageWithLoader';
 import { usePagination } from '../../hooks/usePagination';
+import { Author } from '../../data/db';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -60,7 +61,8 @@ export const ManageAuthorsPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedAuthors.map(author => (
+                            {/* FIX: Added explicit type to map callback parameter */}
+                            {paginatedAuthors.map((author: Author) => (
                                 <tr key={author.id}>
                                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                         <div className="flex items-center">
@@ -92,7 +94,8 @@ export const ManageAuthorsPage = () => {
 
             {/* Mobile Card List */}
             <div className="md:hidden space-y-4">
-                {paginatedAuthors.map(author => (
+                {/* FIX: Added explicit type to map callback parameter */}
+                {paginatedAuthors.map((author: Author) => (
                     <div key={author.id} className="bg-white p-4 rounded-lg shadow">
                         <div className="flex items-center space-x-4">
                             <div className="flex-shrink-0 w-16 h-16">

@@ -15,7 +15,7 @@ export const ReviewList = ({ reviews }: { reviews: Review[] }) => {
 
         switch (sortOption) {
             case 'newest':
-                processedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                processedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(b.createdAt).getTime());
                 break;
             case 'oldest':
                 processedReviews.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -58,7 +58,7 @@ export const ReviewList = ({ reviews }: { reviews: Review[] }) => {
 
             {filteredAndSortedReviews.length > 0 ? (
                 <div className="space-y-8">
-                    {filteredAndSortedReviews.map(review => (
+                    {filteredAndSortedReviews.map((review: Review) => (
                         <ReviewCard key={review.id} review={review} />
                     ))}
                 </div>

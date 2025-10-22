@@ -39,7 +39,7 @@ export const ReviewForm = ({ productId, onReviewSubmitted }: { productId: string
             setImages(newImages);
             
             const newPreviews = [...imagePreviews];
-            files.slice(0, 3 - images.length).forEach(file => {
+            files.slice(0, 3 - images.length).forEach((file: File) => {
                  newPreviews.push(URL.createObjectURL(file));
             });
             setImagePreviews(newPreviews);
@@ -80,7 +80,7 @@ export const ReviewForm = ({ productId, onReviewSubmitted }: { productId: string
             title,
             text,
             images: imageBase64Strings,
-            isVerifiedPurchase: true,
+            isVerifiedPurchase: true, 
         });
         
         showNotification('Спасибо! Ваш отзыв отправлен на модерацию.', 'success');

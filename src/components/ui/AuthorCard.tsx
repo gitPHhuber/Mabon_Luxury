@@ -4,7 +4,13 @@ import { Author } from '../../data/db';
 import { ImageWithLoader } from './ImageWithLoader';
 import { TruncatedText } from './TruncatedText';
 
-export const AuthorCard = ({ author }: { author: Author }) => (
+
+interface AuthorCardProps {
+    author: Author;
+}
+
+
+export const AuthorCard: React.FC<AuthorCardProps> = ({ author }) => (
     <div className="text-center">
         <Link to={`/authors/${author.id}`} className="group block">
             <div className="aspect-square overflow-hidden rounded-full mx-auto w-32 h-32 md:w-48 md:h-48 transition-all duration-500 ease-in-out group-hover:shadow-xl">

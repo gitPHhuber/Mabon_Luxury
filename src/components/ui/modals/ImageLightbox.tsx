@@ -26,9 +26,13 @@ export const ImageLightbox = ({ src, onClose }: ImageLightboxProps) => {
             className="fixed inset-0 bg-brown-gray bg-opacity-80 z-[110] flex items-center justify-center p-4 fade-in" 
             role="dialog" 
             aria-modal="true"
+            aria-labelledby="lightbox-title"
             onClick={onClose}
         >
             <div className="relative max-w-4xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                <h2 id="lightbox-title" className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0 [clip:rect(0,0,0,0)]">
+                    Увеличенное изображение
+                </h2>
                 <img src={src} alt="Enlarged review" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
                 <button 
                     onClick={onClose} 

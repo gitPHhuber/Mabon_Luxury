@@ -66,11 +66,11 @@ export const ProductDetailPage = () => {
     const changeImage = (newIndex: number) => {
         if (newIndex === currentIndex || isTransitioning) return;
         
-        setIsTransitioning(true);
+        setIsTransitioning(true); 
         setTimeout(() => {
-            setCurrentIndex(newIndex);
+            setCurrentIndex(newIndex); 
             setIsTransitioning(false); 
-        }, 200);
+        }, 200); 
     };
 
     const handleNext = () => {
@@ -100,9 +100,9 @@ export const ProductDetailPage = () => {
 
     return (
         <>
-            <div className="container mx-auto px-6 pt-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+                <section className="grid gap-x-8 lg:gap-x-10 gap-y-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
+                    <main className="xl:col-span-9 lg:col-span-7 md:col-span-4 col-span-4">
                         <div className="relative group">
                             <div className={`transition-opacity duration-200 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
                                 {mainImage && (
@@ -134,13 +134,13 @@ export const ProductDetailPage = () => {
                         </div>
                         <div className="flex flex-wrap justify-center md:justify-start gap-2">
                             {gallery.map((imgUrl, index) => (
-                                 <button key={index} onClick={() => changeImage(index)} className={`w-24 h-24 bg-cream p-1 transition-all ${currentIndex === index ? 'ring-2 ring-brown-gray' : 'opacity-60 hover:opacity-100'}`}>
+                                 <button key={index} onClick={() => changeImage(index)} aria-label={`View image ${index + 1}`} aria-current={currentIndex === index} className={`w-24 h-24 bg-cream p-1 transition-all ${currentIndex === index ? 'ring-2 ring-brown-gray' : 'opacity-60 hover:opacity-100'}`}>
                                     <ImageWithLoader src={imgUrl} alt={`${product.name} thumbnail ${index + 1}`} className="w-full h-full" imageClassName="w-full h-full object-cover" />
                                  </button>
                             ))}
                         </div>
-                    </div>
-                    <div>
+                    </main>
+                    <aside className="xl:col-span-7 lg:col-span-5 md:col-span-4 col-span-4 xl:sticky xl:top-28 self-start">
                         <h1 className="font-sans text-4xl text-brown-gray">{product.name}</h1>
                         {author && <p className="mt-2 text-lg font-sans"><Link to={`/authors/${author.id}`} className="hover:underline">{author.name}</Link></p>}
                         <p className="mt-4 font-sans text-2xl font-bold text-brown-gray">{product.price.toLocaleString('ru-RU')} ₽</p>
@@ -161,8 +161,8 @@ export const ProductDetailPage = () => {
                                 </svg>
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </aside>
+                </section>
             </div>
 
             <ReviewsSection productId={product.id} />

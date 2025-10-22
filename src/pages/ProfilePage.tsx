@@ -12,7 +12,7 @@ export const ProfilePage = () => {
     };
     
     if (!user) {
-        return null;
+        return null; 
     }
 
     return (

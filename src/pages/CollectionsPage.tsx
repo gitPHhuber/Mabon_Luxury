@@ -35,6 +35,7 @@ export const CollectionsPage = () => {
     const [priceRange, setPriceRange] = useState<[number, number]>([minPrice, maxPrice]);
     const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
     
+
     useEffect(() => {
         resetFilters();
     }, [collectionFilter, minPrice, maxPrice]);
@@ -45,19 +46,25 @@ export const CollectionsPage = () => {
     }, [minPrice, maxPrice]);
 
     const filteredProducts = useMemo(() => {
-        setLoading(true);
         let tempProducts = collectionFilter === 'Все' ? products : products.filter(p => p.collection === collectionFilter);
         
+
         tempProducts = tempProducts.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+
 
         if (selectedAuthors.length > 0) {
             tempProducts = tempProducts.filter(p => selectedAuthors.includes(p.authorId));
         }
 
-        const timer = setTimeout(() => setLoading(false), 500);
         return tempProducts;
 
     }, [collectionFilter, products, priceRange, selectedAuthors]);
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => setLoading(false), 500);
+        return () => clearTimeout(timer);
+    }, [filteredProducts]);
 
     const sortedProducts = useMemo(() => {
         const sortableProducts = [...filteredProducts];
@@ -94,7 +101,7 @@ export const CollectionsPage = () => {
     const activeFilterCount = (selectedAuthors.length) + (priceRange[0] !== minPrice || priceRange[1] !== maxPrice ? 1 : 0);
 
     return (
-        <div className="container mx-auto px-6 py-12 fade-in">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 fade-in">
             <h1 className="text-center font-sans text-5xl text-brown-gray mb-4">Коллекции</h1>
             <div className="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-12 font-sans">
                 <button onClick={() => setCollectionFilter('Все')} className={`px-4 py-2 text-sm uppercase tracking-wider ${collectionFilter === 'Все' ? 'font-bold underline' : 'hover:underline'}`}>Все</button>
@@ -103,9 +110,9 @@ export const CollectionsPage = () => {
                 ))}
             </div>
 
-            <div className="flex">
+            <div className="grid gap-x-8 lg:gap-x-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
                 {/* Filter Panel - Desktop Sidebar */}
-                <aside className="hidden lg:block w-1/4 pr-8">
+                <aside className="xl:col-span-4 lg:col-span-3 hidden lg:block xl:sticky xl:top-28 self-start">
                      <FilterPanel
                         authors={authors}
                         priceRange={priceRange}
@@ -119,7 +126,7 @@ export const CollectionsPage = () => {
                 </aside>
 
                 {/* Main Content */}
-                <div className="w-full lg:w-3/4">
+                <main className="xl:col-span-12 lg:col-span-9 col-span-4 md:col-span-8">
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6">
                          <button onClick={() => setIsFilterOpen(true)} className="lg:hidden flex items-center mb-4 sm:mb-0 bg-white border border-gray-300 text-brown-gray py-2 px-4 rounded hover:bg-gray-50 font-sans relative">
                             <FilterIcon />
@@ -141,11 +148,11 @@ export const CollectionsPage = () => {
                         maxPrice={maxPrice}
                     />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {loading ? (
                             Array.from({ length: 9 }).map((_, i) => <ProductCardSkeleton key={i} />)
                         ) : sortedProducts.length > 0 ? (
-                            sortedProducts.map(product => <ProductCard key={product.id} product={product} />)
+                            sortedProducts.map((product: Product) => <ProductCard key={product.id} product={product} />)
                         ) : (
                             <div className="col-span-full text-center py-16">
                                 <p className="text-xl">Товары не найдены.</p>
@@ -153,7 +160,7 @@ export const CollectionsPage = () => {
                             </div>
                         )}
                     </div>
-                </div>
+                </main>
             </div>
 
             {/* Filter Panel - Mobile Drawer */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import React, { useState, useEffect, createContext, useContext, useCallback, PropsWithChildren } from 'react';
 import { REVIEWS as mockReviews, Review } from '../data/db';
 
 type NewReviewData = Omit<Review, 'id' | 'createdAt' | 'status'>;
@@ -21,7 +21,7 @@ export const useReview = () => {
     return context;
 };
 
-export const ReviewProvider = ({ children }: { children: React.ReactNode }) => {
+export const ReviewProvider = ({ children }: PropsWithChildren) => {
     const [reviews, setReviews] = useState<Review[]>([]);
 
     useEffect(() => {
@@ -59,7 +59,7 @@ export const ReviewProvider = ({ children }: { children: React.ReactNode }) => {
             ...reviewData,
             id: `r${Date.now()}`,
             createdAt: new Date().toISOString(),
-            status: 'pending', // Set to pending for moderation
+            status: 'pending',
         };
         updateLocalStorage([...reviews, newReview]);
     }, [reviews]);

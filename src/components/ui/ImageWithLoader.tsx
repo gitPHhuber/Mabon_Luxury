@@ -5,8 +5,8 @@ import { getOptimizedImageUrl } from '../../utils/imageOptimizer';
 interface ImageWithLoaderProps {
     src: string;
     alt: string;
-    className?: string;
-    imageClassName?: string;
+    className?: string; 
+    imageClassName?: string; 
 }
 
 export const ImageWithLoader = ({ src, alt, className = '', imageClassName = '' }: ImageWithLoaderProps) => {

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, PropsWithChildren } from 'react';
 
 interface User {
     id: string;
     name: string;
     email: string;
-    password?: string; 
+    password?: string;
 }
 
 interface AuthResult {
@@ -29,7 +29,7 @@ export const useAuth = () => {
     return context;
 };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }: PropsWithChildren) => {
     const [user, setUser] = useState<Omit<User, 'password'> | null>(null);
 
     const getUsers = (): User[] => {
@@ -49,6 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const admin: User = { id: 'admin_user_id', name: 'admin', email: 'admin@mabon.com', password: 'admin' };
             localStorage.setItem('mabon_users', JSON.stringify([...users, admin]));
         }
+
 
         try {
             const storedUser = localStorage.getItem('mabon_current_user');

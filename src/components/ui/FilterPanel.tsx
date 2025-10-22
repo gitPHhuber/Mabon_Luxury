@@ -35,8 +35,8 @@ export const FilterPanel = ({
             </div>
 
             {/* Price Filter */}
-            <div>
-                <h4 className="font-bold text-brown-gray mb-4">Цена</h4>
+            <fieldset>
+                <legend className="font-bold text-brown-gray mb-4">Цена</legend>
                 <PriceRangeSlider
                     min={minPrice}
                     max={maxPrice}
@@ -44,11 +44,11 @@ export const FilterPanel = ({
                     onChange={onPriceChange}
                     step={1000}
                 />
-            </div>
+            </fieldset>
 
             {/* Author Filter */}
-            <div>
-                <h4 className="font-bold text-brown-gray mb-4">Авторы</h4>
+            <fieldset>
+                <legend className="font-bold text-brown-gray mb-4">Авторы</legend>
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
                     {authors.map(author => (
                         <label key={author.id} className="flex items-center cursor-pointer">
@@ -62,7 +62,7 @@ export const FilterPanel = ({
                         </label>
                     ))}
                 </div>
-            </div>
+            </fieldset>
         </div>
     );
 };

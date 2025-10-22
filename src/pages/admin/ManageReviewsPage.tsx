@@ -71,7 +71,8 @@ export const ManageReviewsPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedReviews.map(review => {
+                            {/* FIX: Added explicit type to map callback parameter */}
+                            {paginatedReviews.map((review: Review) => {
                                 const product = getProductById(review.productId);
                                 return (
                                     <tr key={review.id}>
@@ -103,7 +104,8 @@ export const ManageReviewsPage = () => {
 
              {/* Mobile Card List */}
             <div className="md:hidden space-y-4">
-                {paginatedReviews.map(review => {
+                {/* FIX: Added explicit type to map callback parameter */}
+                {paginatedReviews.map((review: Review) => {
                     const product = getProductById(review.productId);
                     return (
                         <div key={review.id} className="bg-white p-4 rounded-lg shadow">

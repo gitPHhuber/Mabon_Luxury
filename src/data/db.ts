@@ -60,8 +60,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     name: 'Фарфоровый сервиз №2',
     description: 'Фарфор/столовая посуда. Элегантная форма и классическая подача.',
     price: 29000,
-    imageUrl: '/images/full/10813642783_cc03e30cce_b-89ff28da60.webp',
-    gallery: ['/images/full/10813642783_cc03e30cce_b-89ff28da60.webp'],
+    imageUrl: '/img_orig/photo_2025-10-22_10-20-22.jpg?v=2',
+    gallery: ['/img_orig/photo_2025-10-22_10-20-22.jpg?v=2'],
     authorId: '2',
     collection: 'Фарфор',
     isFeatured: true,
@@ -407,7 +407,6 @@ export const REVIEWS: Review[] = [
     },
 ];
 
-// This remains dynamic as it's derived from the current products list
 export const getCollections = (products: Product[]) => [...new Set(products.map(p => p.collection))].map(c => ({
     name: c,
     imageUrl: products.find(p => p.collection === c)?.imageUrl || ''

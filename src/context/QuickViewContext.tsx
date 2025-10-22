@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, PropsWithChildren } from 'react';
 import { Product } from '../data/db';
 import { QuickViewModal } from '../components/ui/modals/QuickViewModal';
 
@@ -17,7 +17,7 @@ export const useQuickView = () => {
     return context;
 };
 
-export const QuickViewProvider = ({ children }: { children: React.ReactNode }) => {
+export const QuickViewProvider = ({ children }: PropsWithChildren) => {
     const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
     const openQuickView = (product: Product) => {

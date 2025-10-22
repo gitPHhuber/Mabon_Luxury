@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 
 const validateEmail = (email: string) => {
+
     if (email.toLowerCase() === 'admin') return true;
     const re = /\S+@\S+\.\S+/;
     return re.test(email);

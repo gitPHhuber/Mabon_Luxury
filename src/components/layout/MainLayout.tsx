@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useLocation, useOutlet, matchPath } from 'react-router-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { Header } from './Header';
@@ -13,6 +13,23 @@ export const MainLayout = () => {
     const location = useLocation();
     const { getProductById, getAuthorById } = useData();
     const currentOutlet = useOutlet();
+    const [isLoading, setIsLoading] = useState(false);
+    const isInitialLoad = useRef(true);
+
+    useEffect(() => {
+        if (isInitialLoad.current) {
+            isInitialLoad.current = false;
+            return;
+        }
+
+        setIsLoading(true);
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 700);
+
+        return () => clearTimeout(timer);
+    }, [location.pathname]);
+
     const { nodeRef } = publicRoutes.find(route => {
         const pattern = route.path === '/' ? '/' : `/${route.path}`;
         return matchPath(pattern, location.pathname);
@@ -35,6 +52,7 @@ export const MainLayout = () => {
             'signup': 'Регистрация',
             'profile': 'Профиль',
             'checkout': 'Оформление заказа',
+            'order-success': 'Заказ оформлен',
         };
 
         const firstPath = pathnames[0];
@@ -44,7 +62,6 @@ export const MainLayout = () => {
             return breadcrumbs;
         }
 
-        // Dynamic routes
         if (firstPath === 'products' && pathnames[1]) {
             const product = getProductById(pathnames[1]);
             if (product) {
@@ -75,6 +92,7 @@ export const MainLayout = () => {
 
     return (
         <>
+            {isLoading && <div className="loading-bar" />}
             <Header />
             <Breadcrumbs items={breadcrumbItems} />
             <main>

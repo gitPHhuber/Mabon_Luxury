@@ -45,7 +45,8 @@ export const RatingSummary = ({ reviews }: { reviews: Review[] }) => {
                             <div className="w-full bg-gray-300 rounded-full h-2.5">
                                 <div 
                                     className="bg-brown-gray h-2.5 rounded-full" 
-                                    style={{ width: `${totalReviews > 0 ? (count / totalReviews) * 100 : 0}%` }}
+                                    
+                                    style={{ width: `${totalReviews > 0 ? (Number(count) / totalReviews) * 100 : 0}%` }}
                                 ></div>
                             </div>
                             <span className="text-sm w-8 text-right">{count}</span>

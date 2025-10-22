@@ -61,10 +61,9 @@ export const HomePage = () => {
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentVideoIndex(prevIndex => (prevIndex + 1) % heroVideos.length);
-        }, 8000); 
+        }, 8000); // Switch video every 8 seconds
         return () => clearInterval(timer);
     }, []);
-
 
     useEffect(() => {
         const currentVideo = videoRefs.current[currentVideoIndex];
@@ -75,13 +74,12 @@ export const HomePage = () => {
 
         if (playPromise !== undefined) {
             playPromise.catch(error => {
-
+               
                 if (error.name !== 'AbortError') {
                     console.error("Video autoplay failed:", error);
                 }
             });
         }
-
 
         return () => {
             currentVideo.pause();
@@ -93,7 +91,7 @@ export const HomePage = () => {
         const timer = setTimeout(() => {
             setHomeData({
                 collections: memoizedCollections.slice(0, 3),
-                newProducts: [...products].sort((a, b) => parseInt(b.id.replace('p', '')) - parseInt(a.id.replace('p', ''))).slice(0, 8),
+                newProducts: [...products].sort((a, b) => parseInt(b.id.replace('p', '')) - parseInt(a.id.replace('p', ''))).slice(0, 16),
                 authors: authors.slice(0, 3),
                 featuredProducts: products.filter(p => p.isFeatured).slice(0, 4),
             });
@@ -136,58 +134,76 @@ export const HomePage = () => {
         </section>
 
         <AnimatedSection className="py-24">
-            <div className="container mx-auto px-6">
-                <h2 className="text-center font-sans text-4xl text-brown-gray">Избранные коллекции</h2>
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {loading ? (
-                         Array.from({ length: 3 }).map((_, i) => <CollectionCardSkeleton key={i} />)
-                    ) : (
-                        homeData.collections.map(c => <CollectionCard key={c.name} collection={c} />)
-                    )}
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid gap-x-8 lg:gap-x-10 gap-y-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
+                    <aside className="xl:col-span-4 lg:col-span-3 md:col-span-8 col-span-4 xl:sticky xl:top-28 self-start">
+                        <h2 className="font-sans text-4xl text-brown-gray leading-tight">Избранные коллекции</h2>
+                    </aside>
+                    <main className="xl:col-span-12 lg:col-span-9 md:col-span-8 col-span-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {loading ? (
+                                Array.from({ length: 3 }).map((_, i) => <CollectionCardSkeleton key={i} />)
+                            ) : (
+                                homeData.collections.map((c) => <CollectionCard key={c.name} collection={c} />)
+                            )}
+                        </div>
+                    </main>
                 </div>
             </div>
         </AnimatedSection>
         
         {(loading || homeData.featuredProducts.length > 0) && (
             <AnimatedSection className="py-24">
-                <div className="container mx-auto px-6">
-                    <h2 className="text-center font-sans text-4xl text-brown-gray">Рекомендованные товары</h2>
-                    <p className="text-center mt-2 max-w-2xl mx-auto text-lg">Отобранные вручную шедевры, олицетворяющие суть мастерства и элегантности Mabon.</p>
-                    <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {loading ? (
-                            Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-                        ) : (
-                            homeData.featuredProducts.map(product => <ProductCard key={product.id} product={product} />)
-                        )}
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                     <div className="grid gap-x-8 lg:gap-x-10 gap-y-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
+                        <main className="xl:col-span-12 lg:col-span-9 md:col-span-8 col-span-4">
+                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                                {loading ? (
+                                    Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+                                ) : (
+                                    homeData.featuredProducts.map((product: Product) => <ProductCard key={product.id} product={product} />)
+                                )}
+                            </div>
+                        </main>
+                        <aside className="xl:col-span-4 xl:[grid-column-start:13] lg:col-span-3 lg:[grid-column-start:10] md:col-span-8 col-span-4 xl:sticky xl:top-28 self-start">
+                            <h2 className="font-sans text-4xl text-brown-gray leading-tight">Рекомендованные товары</h2>
+                             <p className="mt-4 text-lg">Отобранные вручную шедевры, олицетворяющие суть мастерства и элегантности Mabon.</p>
+                        </aside>
                     </div>
                 </div>
             </AnimatedSection>
          )}
 
-        <AnimatedSection className="py-24 bg-cream">
-             <h2 className="text-center font-sans text-4xl text-brown-gray mb-12">Новинки</h2>
-             {loading ? (
-                <div className="group w-full overflow-hidden">
-                    <div className="flex justify-center">
-                        <div className="w-full max-w-7xl px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                           {Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)}
-                        </div>
+        <AnimatedSection className="py-24 bg-cream overflow-hidden">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 className="text-center font-sans text-4xl text-brown-gray mb-12">Новинки</h2>
+            </div>
+            {loading ? (
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 opacity-50">
+                        {Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)}
                     </div>
                 </div>
-             ) : (
+            ) : (
                 <InfiniteProductCarousel products={homeData.newProducts} />
-             )}
+            )}
         </AnimatedSection>
 
         <AnimatedSection className="py-24">
-             <div className="container mx-auto px-6">
-                <h2 className="text-center font-sans text-4xl text-brown-gray">Наши мастера</h2>
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-12">
-                   {loading ? (
-                       Array.from({ length: 3 }).map((_, i) => <AuthorCardSkeleton key={i} />)
-                   ) : (
-                       homeData.authors.map(author => <AuthorCard key={author.id} author={author} />)
-                   )}
+             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div className="grid gap-x-8 lg:gap-x-10 gap-y-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
+                    <aside className="xl:col-span-4 lg:col-span-3 md:col-span-8 col-span-4 xl:sticky xl:top-28 self-start">
+                        <h2 className="font-sans text-4xl text-brown-gray leading-tight">Наши мастера</h2>
+                    </aside>
+                    <main className="xl:col-span-12 lg:col-span-9 md:col-span-8 col-span-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+                        {loading ? (
+                            Array.from({ length: 3 }).map((_, i) => <AuthorCardSkeleton key={i} />)
+                        ) : (
+                            homeData.authors.map((author: Author) => <AuthorCard key={author.id} author={author} />)
+                        )}
+                        </div>
+                    </main>
                 </div>
             </div>
         </AnimatedSection>

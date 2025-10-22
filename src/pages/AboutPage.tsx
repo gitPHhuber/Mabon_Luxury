@@ -4,12 +4,12 @@ import { BrandGraphic } from '../components/BrandGraphic';
 export const AboutPage = () => (
     <div className="relative overflow-hidden">
         <BrandGraphic />
-        <div className="container mx-auto px-6 py-24 fade-in min-h-[80vh]">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
-                <div className="md:col-span-1">
-                    <h1 className="font-sans text-5xl text-brown-gray md:sticky top-28">Наша философия</h1>
-                </div>
-                <div className="md:col-span-3">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24 fade-in min-h-[80vh]">
+            <div className="grid gap-x-8 lg:gap-x-10 gap-y-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))] leading-relaxed lg:leading-loose">
+                <aside className="xl:col-span-4 lg:col-span-3 md:col-span-2 col-span-4 xl:sticky xl:top-28 self-start">
+                    <h1 className="font-sans text-5xl text-brown-gray">Наша философия</h1>
+                </aside>
+                <main className="xl:col-span-12 lg:col-span-9 md:col-span-6 col-span-4">
                     <p className="text-lg leading-relaxed max-w-3xl">
                         Mabon — это гармония наследия и инноваций. Мы создаем фарфор, который превращает повседневную жизнь в искусство благодаря ручной работе и диалогу эпох в каждой детали.
                     </p>
@@ -61,7 +61,7 @@ export const AboutPage = () => (
                             </div>
                         </div>
                     </div>
-                </div>
+                </main>
             </div>
         </div>
     </div>

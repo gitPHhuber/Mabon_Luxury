@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo, useCallback, PropsWithChildren } from 'react';
 import { Product, Author, INITIAL_PRODUCTS, INITIAL_AUTHORS, getCollections } from '../data/db';
 
 interface DataContextType {
@@ -26,7 +26,7 @@ export const useData = () => {
     return context;
 };
 
-export const DataProvider = ({ children }: { children: React.ReactNode }) => {
+export const DataProvider = ({ children }: PropsWithChildren) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [authors, setAuthors] = useState<Author[]>([]);
 

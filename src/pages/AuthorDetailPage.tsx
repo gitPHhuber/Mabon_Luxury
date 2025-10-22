@@ -30,19 +30,23 @@ export const AuthorDetailPage = () => {
 
     if (loading) {
         return (
-            <div className="container mx-auto px-6 py-12 fade-in">
-                <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-12">
-                    <Skeleton className="w-48 h-48 rounded-full flex-shrink-0"/>
-                    <div className="space-y-4 flex-grow">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 fade-in">
+                <div className="grid gap-x-8 lg:gap-x-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
+                    <aside className="xl:col-span-4 lg:col-span-5 md:col-span-3 col-span-4">
+                        <Skeleton className="w-48 h-48 rounded-full" />
+                    </aside>
+                    <main className="xl:col-span-12 lg:col-span-7 md:col-span-5 col-span-4 space-y-4">
                         <Skeleton className="h-12 w-3/4" />
                         <Skeleton className="h-5 w-full" />
                         <Skeleton className="h-5 w-full" />
                         <Skeleton className="h-5 w-5/6" />
-                    </div>
-                </div>
-                <h2 className="font-sans text-3xl text-brown-gray mt-24 mb-8"><Skeleton className="h-9 w-1/3" /></h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+                         <div className="pt-16">
+                             <Skeleton className="h-9 w-1/3 mb-8" />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                                {Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+                            </div>
+                        </div>
+                    </main>
                 </div>
             </div>
         );
@@ -51,22 +55,29 @@ export const AuthorDetailPage = () => {
     if (!author) return <div className="container mx-auto text-center py-24">Автор не найден.</div>;
 
     return (
-        <div className="container mx-auto px-6 py-12 fade-in">
-            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-12">
-                <ImageWithLoader 
-                    src={author.imageUrl} 
-                    alt={author.name} 
-                    className="w-48 h-48 rounded-full flex-shrink-0 overflow-hidden bg-gray-200"
-                    imageClassName="w-full h-full object-cover"
-                />
-                <div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 fade-in">
+             <div className="grid gap-x-8 lg:gap-x-10 gap-y-10 grid-cols-4 md:grid-cols-8 lg:grid-cols-12 xl:[grid-template-columns:repeat(16,minmax(0,1fr))]">
+                <aside className="xl:col-span-4 lg:col-span-5 md:col-span-3 col-span-4 xl:sticky xl:top-28 self-start">
+                     <ImageWithLoader 
+                        src={author.imageUrl} 
+                        alt={author.name} 
+                        className="w-48 h-48 rounded-full flex-shrink-0 overflow-hidden bg-gray-200"
+                        imageClassName="w-full h-full object-cover"
+                    />
+                </aside>
+                <main className="xl:col-span-12 lg:col-span-7 md:col-span-5 col-span-4">
                     <h1 className="font-sans text-5xl text-brown-gray">{author.name}</h1>
                     <TruncatedText text={author.bio} maxLength={250} className="mt-4 max-w-2xl text-lg font-serif" />
-                </div>
-            </div>
-            <h2 className="font-sans text-3xl text-brown-gray mt-24 mb-8">Работы {author.name}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                {products.map(product => <ProductCard key={product.id} product={product} />)}
+                    
+                    {products.length > 0 && (
+                        <>
+                            <h2 className="font-sans text-3xl text-brown-gray mt-16 mb-8">Работы {author.name}</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                                {products.map((product: Product) => <ProductCard key={product.id} product={product} />)}
+                            </div>
+                        </>
+                    )}
+                </main>
             </div>
         </div>
     );

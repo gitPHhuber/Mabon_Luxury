@@ -14,6 +14,7 @@ import { SignupPage } from './pages/SignupPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { ContactsPage } from './pages/ContactsPage';
 
+// Admin Pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { ManageProductsPage } from './pages/admin/ManageProductsPage';
 import { ProductFormPage } from './pages/admin/ProductFormPage';
@@ -38,13 +39,14 @@ const allRoutes: RouteConfig[] = [
     { path: 'about', Component: AboutPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'contacts', Component: ContactsPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'checkout', Component: CheckoutPage, nodeRef: React.createRef<HTMLDivElement>(), isProtected: true },
-    { path: 'checkout/success', Component: OrderSuccessPage, nodeRef: React.createRef<HTMLDivElement>() },
+    { path: 'order-success', Component: OrderSuccessPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'search', Component: SearchPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'wishlist', Component: WishlistPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'login', Component: LoginPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'signup', Component: SignupPage, nodeRef: React.createRef<HTMLDivElement>() },
     { path: 'profile', Component: ProfilePage, nodeRef: React.createRef<HTMLDivElement>(), isProtected: true },
     
+    // Admin Routes
     { path: 'admin/dashboard', Component: AdminDashboardPage, nodeRef: React.createRef<HTMLDivElement>(), isProtected: true, isAdmin: true },
     { path: 'admin/products', Component: ManageProductsPage, nodeRef: React.createRef<HTMLDivElement>(), isProtected: true, isAdmin: true },
     { path: 'admin/products/new', Component: ProductFormPage, nodeRef: React.createRef<HTMLDivElement>(), isProtected: true, isAdmin: true },

@@ -1,12 +1,20 @@
-# Mabon — коллекция предметов из фарфора и скульптуры
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-## Описание проекта
-Приложение представляет собой витрину интернет-магазина, посвящённого дизайнерскому фарфору и скульптурам. Интерфейс построен на React и позволяет посетителям просматривать коллекции, знакомиться с описаниями товаров, читать отзывы, добавлять позиции в избранное и корзину, а также вести диалог с консультантом через встроенный чат-виджет.
+# Run and deploy your AI Studio app
 
-## Структура
-Основные директории проекта:
-- `src/pages` — публичные и административные страницы.
-- `src/components` — переиспользуемые UI-компоненты, включая чат-виджет и элементы навигации.
-- `src/context` — контексты для аутентификации, корзины, избранного, отзывов, уведомлений и чата.
-- `src/data` — статические данные и мок-коллекции.
-- `src/utils` и `src/hooks` — вспомогательные утилиты и кастомные хуки.
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/drive/18cvecCWzck4a65bwEiWlxaufnZza2Jum
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

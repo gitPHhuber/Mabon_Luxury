@@ -4,7 +4,13 @@ import { StarRating } from './StarRating';
 import { ImageWithLoader } from '../ImageWithLoader';
 import { ImageLightbox } from '../modals/ImageLightbox';
 
-export const ReviewCard = ({ review }: { review: Review }) => {
+
+interface ReviewCardProps {
+    review: Review;
+}
+
+
+export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
     const [lightboxImage, setLightboxImage] = useState<string | null>(null);
     const reviewDate = new Date(review.createdAt).toLocaleDateString('ru-RU', {
         year: 'numeric',

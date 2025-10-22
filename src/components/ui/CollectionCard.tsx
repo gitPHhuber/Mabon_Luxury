@@ -2,7 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ImageWithLoader } from './ImageWithLoader';
 
-export const CollectionCard = ({ collection }: { collection: { name: string; imageUrl: string } }) => (
+interface CollectionCardProps {
+    collection: { name: string; imageUrl: string };
+}
+
+
+export const CollectionCard: React.FC<CollectionCardProps> = ({ collection }) => (
     <Link to="/collections" state={{ filter: collection.name }} className="group relative block aspect-square overflow-hidden">
         <ImageWithLoader
             src={collection.imageUrl}

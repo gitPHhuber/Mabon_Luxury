@@ -1,11 +1,11 @@
-import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo, PropsWithChildren } from 'react';
 import { useCookieConsent } from './CookieConsentContext';
 import { useData } from './DataContext';
 import { Product } from '../data/db';
 
 
 interface WishlistContextType {
-    wishlistItems: string[];
+    wishlistItems: string[]; 
     wishlistedProducts: Product[];
     addToWishlist: (productId: string) => void;
     removeFromWishlist: (productId: string) => void;
@@ -23,7 +23,7 @@ export const useWishlist = () => {
     return context;
 };
 
-export const WishlistProvider = ({ children }: { children: React.ReactNode }) => {
+export const WishlistProvider = ({ children }: PropsWithChildren) => {
     const [wishlistItems, setWishlistItems] = useState<string[]>([]);
     const { cookieConsent } = useCookieConsent();
     const { products } = useData();

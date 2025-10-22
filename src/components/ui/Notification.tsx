@@ -8,7 +8,7 @@ interface NotificationProps {
 
 export const Notification = ({ message, type, onClose }: NotificationProps) => {
     useEffect(() => {
-        const timer = setTimeout(onClose, 3000);
+        const timer = setTimeout(onClose, 3000); 
         return () => clearTimeout(timer);
     }, [onClose]);
 

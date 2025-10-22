@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext, useCallback } from 'react';
+import React, { useState, createContext, useContext, useCallback, PropsWithChildren } from 'react';
 import { Notification } from '../components/ui/Notification';
 
 interface NotificationState {
@@ -20,7 +20,7 @@ export const useNotification = () => {
     return context;
 };
 
-export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
+export const NotificationProvider = ({ children }: PropsWithChildren) => {
     const [notification, setNotification] = useState<NotificationState | null>(null);
 
     const showNotification = useCallback((message: string, type: 'success' | 'error' = 'success') => {

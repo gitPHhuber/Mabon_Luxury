@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Dispatch, SetStateAction } from 'react';
 
 interface PaginationResult<T> {
     currentPage: number;
     totalPages: number;
     paginatedData: T[];
-    setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+
+    setCurrentPage: Dispatch<SetStateAction<number>>;
 }
 
 export const usePagination = <T>(data: T[], itemsPerPage: number): PaginationResult<T> => {
@@ -13,6 +14,7 @@ export const usePagination = <T>(data: T[], itemsPerPage: number): PaginationRes
     const totalPages = useMemo(() => Math.ceil(data.length / itemsPerPage), [data.length, itemsPerPage]);
 
     useEffect(() => {
+
         const lastPage = totalPages > 0 ? totalPages : 1;
         if (currentPage > lastPage) {
             setCurrentPage(lastPage);

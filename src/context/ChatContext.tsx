@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext, useCallback, ReactNode } from 'react';
+import React, { useState, createContext, useContext, useCallback, ReactNode, PropsWithChildren } from 'react';
 
 export interface Message {
     id: number;
@@ -31,7 +31,7 @@ const initialMessage: Message = {
     timestamp: new Date().toISOString()
 };
 
-export const ChatProvider = ({ children }: { children: ReactNode }) => {
+export const ChatProvider = ({ children }: PropsWithChildren) => {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([initialMessage]);
     

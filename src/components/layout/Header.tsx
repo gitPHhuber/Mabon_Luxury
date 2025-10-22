@@ -17,14 +17,16 @@ export const Header = () => {
     const navigate = useNavigate();
 
     const [suggestions, setSuggestions] = useState<{ products: Product[], authors: Author[] }>({ products: [], authors: [] });
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [hasMounted, setHasMounted] = useState(false);
-    const searchContainerRef = useRef<HTMLDivElement>(null);
+    
     const profileRef = useRef<HTMLDivElement>(null);
-    const mobileMenuOverlayRef = useRef<HTMLDivElement>(null);
-    const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const menuOverlayRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const searchOverlayRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     
     const [isInitialLoad] = useState(() => !sessionStorage.getItem('logoAnimated'));
 
@@ -39,42 +41,73 @@ export const Header = () => {
     }, []);
 
     useEffect(() => {
-        if (isMobileMenuOpen) {
-            document.body.style.overflow = 'hidden';
-            document.body.classList.add('menu-open');
+        const body = document.body;
+        if (isMenuOpen || isSearchOpen) {
+            body.style.overflow = 'hidden';
+            if (isMenuOpen) body.classList.add('menu-open');
         } else {
-            document.body.style.overflow = 'auto';
-            document.body.classList.remove('menu-open');
+            body.style.overflow = 'auto';
+            body.classList.remove('menu-open');
         }
         return () => {
-            document.body.style.overflow = 'auto';
-            document.body.classList.remove('menu-open');
+            body.style.overflow = 'auto';
+            body.classList.remove('menu-open');
         };
-    }, [isMobileMenuOpen]);
+    }, [isMenuOpen, isSearchOpen]);
+
+    useEffect(() => {
+        if (isSearchOpen) {
+
+            setTimeout(() => searchInputRef.current?.focus(), 300);
+        }
+    }, [isSearchOpen]);
 
     useEffect(() => {
         if (searchQuery.length < 2) {
             setSuggestions({ products: [], authors: [] });
-            setIsDropdownOpen(false);
             return;
         }
 
         const handler = setTimeout(() => {
             const lowercasedQuery = searchQuery.toLowerCase();
-            const foundProducts = products.filter(p =>
-                p.name.toLowerCase().includes(lowercasedQuery) ||
-                p.description.toLowerCase().includes(lowercasedQuery) ||
-                p.collection.toLowerCase().includes(lowercasedQuery)
-            ).slice(0, 5);
+            
+            const scoredProducts = products
+                .map(product => {
+                    const name = product.name.toLowerCase();
+                    const description = product.description.toLowerCase();
+                    const collection = product.collection.toLowerCase();
+                    let score = 0;
 
-            const foundAuthors = authors.filter(a =>
-                a.name.toLowerCase().includes(lowercasedQuery) ||
-                a.bio.toLowerCase().includes(lowercasedQuery)
-            ).slice(0, 3);
+                    if (name.startsWith(lowercasedQuery)) score += 10;
+                    else if (name.includes(lowercasedQuery)) score += 5;
+                    
+                    if (collection.includes(lowercasedQuery)) score += 2;
+                    if (description.includes(lowercasedQuery)) score += 1;
 
-            const hasResults = foundProducts.length > 0 || foundAuthors.length > 0;
-            setSuggestions({ products: foundProducts, authors: foundAuthors });
-            setIsDropdownOpen(hasResults);
+                    return { product, score };
+                })
+                .filter(item => item.score > 0)
+                .sort((a, b) => b.score - a.score)
+                .map(item => item.product);
+
+            const scoredAuthors = authors
+                .map(author => {
+                    const name = author.name.toLowerCase();
+                    const bio = author.bio.toLowerCase();
+                    let score = 0;
+
+                    if (name.startsWith(lowercasedQuery)) score += 10;
+                    else if (name.includes(lowercasedQuery)) score += 5;
+                    
+                    if (bio.includes(lowercasedQuery)) score += 1;
+
+                    return { author, score };
+                })
+                .filter(item => item.score > 0)
+                .sort((a, b) => b.score - a.score)
+                .map(item => item.author);
+
+            setSuggestions({ products: scoredProducts.slice(0, 4), authors: scoredAuthors.slice(0, 3) });
         }, 300);
 
         return () => {
@@ -84,9 +117,6 @@ export const Header = () => {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false);
-            }
             if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
                 setIsProfileOpen(false);
             }
@@ -103,15 +133,13 @@ export const Header = () => {
         if (trimmedQuery) {
             navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
             setSearchQuery('');
-            setIsDropdownOpen(false);
-            setIsMobileMenuOpen(false);
+            setIsSearchOpen(false);
         }
     };
     
     const handleSuggestionClick = () => {
         setSearchQuery('');
-        setIsDropdownOpen(false);
-        setIsMobileMenuOpen(false);
+        setIsSearchOpen(false);
     };
 
     const handleLogout = () => {
@@ -121,7 +149,7 @@ export const Header = () => {
     };
     
     const handleMenuLinkClick = () => {
-        setIsMobileMenuOpen(false);
+        setIsMenuOpen(false);
     };
     
     const handleLogoutAndCloseMenu = () => {
@@ -130,174 +158,196 @@ export const Header = () => {
     };
     
     return (
-        <header className="sticky top-0 z-50 bg-white bg-opacity-95 backdrop-blur-md fade-in">
+        <header className={`sticky top-0 z-[200] ${isMenuOpen || isSearchOpen ? 'bg-white' : 'bg-white/95 backdrop-blur-md'} transition-colors duration-300 fade-in`}>
             <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                <Link to="/" onClick={handleMenuLinkClick} className={`font-logo text-3xl font-bold tracking-widest text-brown-gray ${isInitialLoad ? 'animate-logo-fade-in' : ''}`}>MABON</Link>
+                <div className="flex items-center gap-4">
+                     <button onClick={() => setIsMenuOpen(true)} className="btn-icon" aria-label="Открыть меню" aria-expanded={isMenuOpen}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <Link to="/" onClick={handleMenuLinkClick} className={`font-logo text-3xl font-bold tracking-widest text-brown-gray ${isInitialLoad ? 'animate-logo-fade-in' : ''}`}>MABON</Link>
+                </div>
                 
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center space-x-4 md:space-x-6">
-                    <div className="flex items-center space-x-8 font-sans">
-                        <Link to="/collections" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">Коллекции</Link>
-                        <Link to="/authors" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">Авторы</Link>
-                        <Link to="/about" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">О нас</Link>
-                        <Link to="/contacts" className="text-sm uppercase tracking-wider text-brown-gray hover:underline">Контакты</Link>
-                    </div>
-                     <div ref={searchContainerRef} className="relative">
-                        <form onSubmit={handleSearchSubmit}>
-                            <input
-                                type="search"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onFocus={() => searchQuery.length >= 2 && setIsDropdownOpen(true)}
-                                placeholder="Поиск..."
-                                className="w-32 md:w-40 px-4 py-1.5 border border-gray-300 rounded-full text-sm text-brown-gray placeholder-brown-gray/70 focus:outline-none focus:ring-1 focus:ring-brown-gray focus:border-brown-gray transition-all duration-300"
-                                aria-label="Поиск по сайту"
-                            />
-                             <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-brown-gray transition-opacity hover:opacity-80" aria-label="Начать поиск">
-                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                        </form>
-                        {isDropdownOpen && (
-                            <div className="absolute top-full mt-2 w-80 bg-white rounded-md shadow-lg z-10 max-h-96 overflow-y-auto text-left font-sans">
-                                {suggestions.products.length > 0 && (
-                                    <div>
-                                        <h4 className="text-xs uppercase text-brown-gray tracking-wider px-4 py-2 bg-cream">Товары</h4>
-                                        <ul>
-                                            {suggestions.products.map(product => (
-                                                <li key={product.id}>
-                                                    <Link to={`/products/${product.id}`} onClick={handleSuggestionClick} className="flex items-center p-3 hover:bg-gray-100 transition-colors duration-200">
-                                                        <ImageWithLoader src={product.imageUrl} alt={product.name} className="w-12 h-16 mr-4 flex-shrink-0 bg-gray-200" imageClassName="w-full h-full object-cover" />
-                                                        <div>
-                                                            <p className="text-sm text-brown-gray font-bold leading-tight">{product.name}</p>
-                                                            <p className="text-xs text-brown-gray mt-1">{product.price.toLocaleString('ru-RU')} ₽</p>
-                                                        </div>
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                                {suggestions.authors.length > 0 && (
-                                     <div>
-                                        <h4 className="text-xs uppercase text-brown-gray tracking-wider px-4 py-2 bg-cream border-t border-gray-200">Авторы</h4>
-                                        <ul>
-                                            {suggestions.authors.map(author => (
-                                                <li key={author.id}>
-                                                    <Link to={`/authors/${author.id}`} onClick={handleSuggestionClick} className="flex items-center p-3 hover:bg-gray-100 transition-colors duration-200">
-                                                        <ImageWithLoader src={author.imageUrl} alt={author.name} className="w-10 h-10 rounded-full mr-4 flex-shrink-0 overflow-hidden bg-gray-200" imageClassName="w-full h-full object-cover" />
-                                                        <p className="text-sm text-brown-gray font-bold">{author.name}</p>
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                                <Link to={`/search?q=${encodeURIComponent(searchQuery)}`} onClick={handleSuggestionClick} className="block text-center font-bold text-sm py-3 bg-gray-50 hover:bg-gray-100 text-brown-gray transition-colors duration-200 border-t border-gray-200">
-                                    Показать все результаты
-                                </Link>
-                            </div>
-                        )}
-                    </div>
+                <div className="flex items-center space-x-2">
                     {user ? (
-                        <div ref={profileRef} className="relative">
-                            <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="btn-icon" aria-label="Открыть меню профиля">
+                        <div ref={profileRef} className="relative hidden sm:block">
+                            <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="btn-icon" aria-label="Открыть меню профиля" aria-haspopup="true" aria-expanded={isProfileOpen}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </button>
                             {isProfileOpen && (
-                                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 font-sans text-left">
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 font-sans text-left" role="menu" aria-orientation="vertical">
                                     <div className="p-3 border-b">
                                         <p className="text-sm text-brown-gray font-bold truncate">Привет, {user.name}</p>
                                     </div>
                                     {user.name === 'admin' && (
-                                         <Link to="/admin" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2 text-sm text-brown-gray hover:bg-gray-100 font-bold">Панель администратора</Link>
+                                        <Link to="/admin" onClick={() => setIsProfileOpen(false)} role="menuitem" className="block px-4 py-2 text-sm text-brown-gray hover:bg-gray-100 font-bold">Панель администратора</Link>
                                     )}
-                                    <Link to="/profile" onClick={() => setIsProfileOpen(false)} className="block px-4 py-2 text-sm text-brown-gray hover:bg-gray-100">Профиль</Link>
-                                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-brown-gray hover:bg-gray-100">Выйти</button>
+                                    <Link to="/profile" onClick={() => setIsProfileOpen(false)} role="menuitem" className="block px-4 py-2 text-sm text-brown-gray hover:bg-gray-100">Профиль</Link>
+                                    <button onClick={handleLogout} role="menuitem" className="w-full text-left px-4 py-2 text-sm text-brown-gray hover:bg-gray-100">Выйти</button>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <Link to="/login" className="text-sm uppercase tracking-wider text-brown-gray hover:underline font-sans">Войти</Link>
+                        <Link to="/login" className="text-sm uppercase tracking-wider text-brown-gray hover:underline font-sans hidden sm:block">Войти</Link>
                     )}
                     <Link to="/wishlist" className="relative group btn-icon" aria-label={`Открыть избранное с ${wishlistCount} товарами`}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.664l1.318-1.346a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
                         </svg>
                         {wishlistCount > 0 && (
-                             <span className="absolute -top-2 -right-2 flex items-center justify-center bg-brown-gray text-white text-xs rounded-full h-5 w-5 font-sans">{wishlistCount}</span>
+                            <span className="absolute -top-2 -right-2 flex items-center justify-center bg-brown-gray text-white text-xs rounded-full h-5 w-5 font-sans">{wishlistCount}</span>
                         )}
                     </Link>
+                    <button onClick={() => setIsSearchOpen(true)} className="btn-icon" aria-label="Открыть поиск">
+                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
                     <button onClick={toggleCart} className="relative group btn-icon" aria-label={`Открыть корзину с ${cartCount} товарами`}>
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                         {cartCount > 0 && (
-                             <span className="absolute -top-2 -right-2 flex items-center justify-center bg-brown-gray text-white text-xs rounded-full h-5 w-5 font-sans">{cartCount}</span>
+                            <span className="absolute -top-2 -right-2 flex items-center justify-center bg-brown-gray text-white text-xs rounded-full h-5 w-5 font-sans">{cartCount}</span>
                         )}
-                    </button>
-                </nav>
-
-                {/* Mobile Icons & Hamburger */}
-                <div className="flex items-center space-x-2 md:hidden">
-                    <Link to="/wishlist" className="relative group btn-icon" aria-label={`Открыть избранное с ${wishlistCount} товарами`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.664l1.318-1.346a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-                        </svg>
-                        {wishlistCount > 0 && <span className="absolute -top-2 -right-2 flex items-center justify-center bg-brown-gray text-white text-xs rounded-full h-5 w-5 font-sans">{wishlistCount}</span>}
-                    </Link>
-                    <button onClick={toggleCart} className="relative group btn-icon" aria-label={`Открыть корзину с ${cartCount} товарами`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                        {cartCount > 0 && <span className="absolute -top-2 -right-2 flex items-center justify-center bg-brown-gray text-white text-xs rounded-full h-5 w-5 font-sans">{cartCount}</span>}
-                    </button>
-                    <button onClick={() => setIsMobileMenuOpen(true)} className="btn-icon" aria-label="Открыть меню" aria-expanded={isMobileMenuOpen}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Drawer */}
+            {/* Search Overlay */}
+            {hasMounted && (
+                <CSSTransition
+                    in={isSearchOpen}
+                    timeout={300}
+                    classNames="search-overlay"
+                    unmountOnExit
+                    nodeRef={searchOverlayRef}
+                >
+                    <div
+                        ref={searchOverlayRef}
+                        className="fixed inset-0 z-[1400] bg-white p-6 flex flex-col"
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        <div className="flex justify-end">
+                            <button onClick={() => setIsSearchOpen(false)} aria-label="Закрыть поиск" className="btn-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+
+                        <div className="flex-grow flex flex-col items-center mt-4 md:mt-8">
+                             <div className="w-full max-w-3xl">
+                                <form onSubmit={handleSearchSubmit} className="relative">
+                                    <input
+                                        ref={searchInputRef}
+                                        type="search"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Поиск по коллекциям, авторам, товарам..."
+                                        className="w-full bg-transparent border-b-2 border-brown-gray/30 py-4 px-2 text-xl md:text-3xl text-brown-gray placeholder-brown-gray/50 focus:outline-none focus:border-brown-gray transition-all"
+                                        aria-label="Поиск по сайту"
+                                    />
+                                </form>
+                                <div className="mt-8 text-left max-h-[65vh] overflow-y-auto pr-4">
+                                     {searchQuery.length < 2 && (
+                                        <div className="text-center text-brown-gray/60 pt-10">
+                                            <p>Начните вводить, чтобы найти товары или авторов.</p>
+                                        </div>
+                                    )}
+                                    {searchQuery.length >= 2 && !suggestions.products.length && !suggestions.authors.length && (
+                                        <div className="text-center text-brown-gray/60 pt-10">
+                                            <p>Ничего не найдено по запросу "{searchQuery}".</p>
+                                            <p className="text-sm mt-2">Попробуйте изменить запрос или используйте более общие слова.</p>
+                                        </div>
+                                    )}
+                                    {(suggestions.products.length > 0 || suggestions.authors.length > 0) && (
+                                        <div className="space-y-8">
+                                            {suggestions.products.length > 0 && (
+                                                <div>
+                                                    <h4 className="text-sm uppercase text-brown-gray tracking-wider px-2 pb-2 border-b">Товары</h4>
+                                                    <ul className="mt-4 space-y-2">
+                                                        {suggestions.products.map(product => (
+                                                            <li key={product.id}>
+                                                                <Link to={`/products/${product.id}`} onClick={handleSuggestionClick} className="flex items-center p-2 hover:bg-cream rounded-md transition-colors duration-200 group">
+                                                                    <ImageWithLoader src={product.imageUrl} alt={product.name} className="w-16 h-20 mr-4 flex-shrink-0 bg-gray-200 rounded" imageClassName="w-full h-full object-cover rounded" />
+                                                                    <div className="flex-grow">
+                                                                        <p className="text-md text-brown-gray font-bold leading-tight group-hover:underline">{product.name}</p>
+                                                                        <p className="text-sm text-brown-gray/70 mt-1">{product.collection}</p>
+                                                                    </div>
+                                                                    <p className="text-md text-brown-gray font-semibold ml-4">{product.price.toLocaleString('ru-RU')} ₽</p>
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {suggestions.authors.length > 0 && (
+                                                <div>
+                                                    <h4 className="text-sm uppercase text-brown-gray tracking-wider px-2 pb-2 border-b">Авторы</h4>
+                                                    <ul className="mt-4 space-y-2">
+                                                        {suggestions.authors.map(author => (
+                                                            <li key={author.id}>
+                                                                <Link to={`/authors/${author.id}`} onClick={handleSuggestionClick} className="flex items-center p-2 hover:bg-cream rounded-md transition-colors duration-200 group">
+                                                                    <ImageWithLoader src={author.imageUrl} alt={author.name} className="w-12 h-12 rounded-full mr-4 flex-shrink-0 overflow-hidden bg-gray-200" imageClassName="w-full h-full object-cover" />
+                                                                    <p className="text-md text-brown-gray font-bold group-hover:underline">{author.name}</p>
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            <div className="pt-4 text-center">
+                                                <button onClick={() => handleSearchSubmit({ preventDefault: () => {} } as any)} className="btn btn-secondary w-full max-w-xs mx-auto">
+                                                    Показать все результаты ({suggestions.products.length + suggestions.authors.length})
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </CSSTransition>
+            )}
+
+            {/* Main Menu Drawer */}
             {hasMounted && (
                 <>
                     <CSSTransition
-                        in={isMobileMenuOpen}
+                        in={isMenuOpen}
                         timeout={300}
-                        classNames="mobile-menu-overlay"
+                        classNames="main-menu-overlay"
                         unmountOnExit
-                        nodeRef={mobileMenuOverlayRef}
+                        nodeRef={menuOverlayRef}
                     >
                         <div
-                            ref={mobileMenuOverlayRef}
-                            className="fixed inset-0 bg-brown-gray bg-opacity-50 z-[99] md:hidden"
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            ref={menuOverlayRef}
+                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1200]"
+                            onClick={() => setIsMenuOpen(false)}
                             aria-hidden="true"
                         ></div>
                     </CSSTransition>
                     
                     <CSSTransition
-                        in={isMobileMenuOpen}
+                        in={isMenuOpen}
                         timeout={300}
-                        classNames="mobile-menu"
+                        classNames="main-menu"
                         unmountOnExit
-                        nodeRef={mobileMenuRef}
+                        nodeRef={menuRef}
                     >
                         <div
-                            ref={mobileMenuRef}
-                            className="fixed top-0 right-0 h-full w-full max-w-sm z-[100] bg-cream shadow-2xl md:hidden flex flex-col p-6"
+                            ref={menuRef}
+                            className="fixed top-0 left-0 h-dvh w-full max-w-sm z-[1300] bg-white shadow-2xl flex flex-col p-6"
                             role="dialog"
                             aria-modal="true"
                         >
                             {/* Menu Header */}
                             <div className="flex justify-between items-center">
                                 <Link to="/" onClick={handleMenuLinkClick} className="font-logo text-3xl font-bold tracking-widest text-gray-900">MABON</Link>
-                                <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Закрыть меню" className="btn-icon !text-gray-900">
+                                <button onClick={() => setIsMenuOpen(false)} aria-label="Закрыть меню" className="btn-icon !text-gray-900">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
                             </div>
@@ -312,21 +362,9 @@ export const Header = () => {
                                 </nav>
 
                                 <div className="mt-12 w-full">
-                                    <form onSubmit={handleSearchSubmit} className="relative">
-                                        <input
-                                            type="search"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            placeholder="Поиск по сайту..."
-                                            className="w-full bg-transparent border-b border-gray-900/50 py-2 text-base text-gray-900 placeholder-gray-900/70 focus:outline-none focus:border-gray-900 transition-colors text-center"
-                                            aria-label="Поиск по сайту"
-                                        />
-                                        <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-900 transition-opacity hover:opacity-80" aria-label="Начать поиск">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </button>
-                                    </form>
+                                    <button onClick={() => { setIsMenuOpen(false); setIsSearchOpen(true); }} className="w-full bg-transparent border-b border-gray-900/50 py-2 text-base text-gray-900/70 focus:outline-none focus:border-gray-900 transition-colors text-center">
+                                        Поиск по сайту...
+                                    </button>
                                 </div>
                             </div>
 

@@ -5,6 +5,7 @@ import { Pagination } from '../../components/ui/Pagination';
 import { useConfirmationModal } from '../../context/ConfirmationModalContext';
 import { ImageWithLoader } from '../../components/ui/ImageWithLoader';
 import { usePagination } from '../../hooks/usePagination';
+import { Product } from '../../data/db';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -65,7 +66,8 @@ export const ManageProductsPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedProducts.map(product => (
+                            {/* FIX: Added explicit type to map callback parameter */}
+                            {paginatedProducts.map((product: Product) => (
                                 <tr key={product.id}>
                                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                         <div className="flex items-center">
@@ -107,7 +109,8 @@ export const ManageProductsPage = () => {
 
             {/* Mobile Card List */}
             <div className="md:hidden space-y-4">
-                {paginatedProducts.map(product => (
+                {/* FIX: Added explicit type to map callback parameter */}
+                {paginatedProducts.map((product: Product) => (
                     <div key={product.id} className="bg-white p-4 rounded-lg shadow">
                         <div className="flex items-start space-x-4">
                             <div className="flex-shrink-0 w-20 h-24">

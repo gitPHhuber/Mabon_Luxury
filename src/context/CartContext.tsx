@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo, PropsWithChildren } from 'react';
 import { Product, CartItem } from '../data/db';
 import { useCookieConsent } from './CookieConsentContext';
 
@@ -24,7 +24,7 @@ export const useCart = () => {
     return context;
 };
 
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+export const CartProvider = ({ children }: PropsWithChildren) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const { cookieConsent } = useCookieConsent();

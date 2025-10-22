@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext, useCallback } from 'react';
+import React, { useState, createContext, useContext, useCallback, PropsWithChildren } from 'react';
 import { ConfirmationModal } from '../components/ui/modals/ConfirmationModal';
 
 interface ModalOptions {
@@ -21,7 +21,7 @@ export const useConfirmationModal = () => {
     return context;
 };
 
-export const ConfirmationModalProvider = ({ children }: { children: React.ReactNode }) => {
+export const ConfirmationModalProvider = ({ children }: PropsWithChildren) => {
     const [modalOptions, setModalOptions] = useState<ModalOptions | null>(null);
 
     const showConfirmation = useCallback((title: string, message: string, onConfirm: () => void) => {

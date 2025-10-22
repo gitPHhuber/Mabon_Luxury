@@ -7,7 +7,12 @@ import { ImageWithLoader } from './ImageWithLoader';
 import { useCart } from '../../context/CartContext';
 import { useData } from '../../context/DataContext';
 
-export const ProductCard = ({ product }: { product: Product }) => {
+
+interface ProductCardProps {
+    product: Product;
+}
+
+export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { openQuickView } = useQuickView();
     const { addToCart } = useCart();

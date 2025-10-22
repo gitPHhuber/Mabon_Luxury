@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { ProductCard } from '../components/ui/ProductCard';
+import { Product } from '../data/db';
 
 export const WishlistPage = () => {
     const { wishlistedProducts } = useWishlist();
@@ -20,7 +21,7 @@ export const WishlistPage = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {wishlistedProducts.map(product => (
+                    {wishlistedProducts.map((product: Product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </div>

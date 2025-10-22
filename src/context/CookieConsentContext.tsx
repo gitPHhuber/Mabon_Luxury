@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import React, { useState, useEffect, createContext, useContext, useCallback, PropsWithChildren } from 'react';
 import { CookieConsentBanner } from '../components/CookieConsentBanner';
 
 interface CookieConsentContextType {
@@ -16,7 +16,7 @@ export const useCookieConsent = () => {
     return context;
 };
 
-export const CookieConsentProvider = ({ children }: { children: React.ReactNode }) => {
+export const CookieConsentProvider = ({ children }: PropsWithChildren) => {
     const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
 
     useEffect(() => {

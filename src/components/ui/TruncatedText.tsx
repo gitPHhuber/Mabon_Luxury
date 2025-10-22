@@ -8,6 +8,7 @@ interface TruncatedTextProps {
 
 export const TruncatedText = ({ text, maxLength, className = '' }: TruncatedTextProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [textId] = useState(() => `truncated-text-${Math.random().toString(36).substr(2, 9)}`);
 
     if (text.length <= maxLength) {
         return <p className={className}>{text}</p>;
@@ -21,13 +22,14 @@ export const TruncatedText = ({ text, maxLength, className = '' }: TruncatedText
 
     return (
         <div>
-            <p className={className}>
+            <p id={textId} className={className}>
                 {isExpanded ? text : `${text.substring(0, maxLength)}...`}
             </p>
             <button
                 onClick={toggleExpanded}
                 className="text-brown-gray font-bold hover:underline mt-2 font-sans text-sm"
                 aria-expanded={isExpanded}
+                aria-controls={textId}
             >
                 {isExpanded ? 'Свернуть' : 'Читать далее'}
             </button>
